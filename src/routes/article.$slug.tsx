@@ -11,13 +11,13 @@ export const Route = createFileRoute("/article/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Story not found — The Meridian" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "ଖବର ମିଳିଲା ନାହିଁ — ମେରିଡିଆନ୍ ଖବର" }, { name: "robots", content: "noindex" }],
       };
     }
     const { article } = loaderData;
     return {
       meta: [
-        { title: `${article.title} — The Meridian` },
+        { title: `${article.title} — ମେରିଡିଆନ୍ ଖବର` },
         { name: "description", content: article.dek },
         { property: "og:title", content: article.title },
         { property: "og:description", content: article.dek },
@@ -44,7 +44,7 @@ function ArticlePage() {
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">{article.dek}</p>
         <p className="mt-4 border-y border-border py-3 text-xs text-muted-foreground">
-          By {article.author} · {formatDate(article.date)} · {article.readMinutes} min read
+          {article.author} · {formatDate(article.date)} · {article.readMinutes} ମିନିଟ୍ ପଠନ
         </p>
         <img
           src={article.image}
@@ -57,7 +57,7 @@ function ArticlePage() {
           ))}
         </div>
         <Link to="/" className="mt-10 inline-block text-sm underline underline-offset-4">
-          ← Back to front page
+          ← ମୁଖ୍ୟ ପୃଷ୍ଠାକୁ ଫେରନ୍ତୁ
         </Link>
       </main>
       <SiteFooter />

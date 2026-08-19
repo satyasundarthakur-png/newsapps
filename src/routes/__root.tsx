@@ -77,8 +77,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "The Meridian" },
-      { name: "description", content: "Independent daily news and reporting." },
+      { title: "ମେରିଡିଆନ୍ ଖବର" },
+      { name: "description", content: "ସ୍ୱାଧୀନ ଓଡ଼ିଆ ଦୈନିକ ଖବର।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter+Tight:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Noto+Serif+Oriya:wght@500;600;700&family=Noto+Sans+Oriya:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
