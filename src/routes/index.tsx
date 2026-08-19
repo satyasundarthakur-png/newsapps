@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { articles, formatDate } from "@/data/articles";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 
-const title = "The Meridian — Independent daily news";
+const title = "ମେରିଡିଆନ୍ ଖବର — ସ୍ୱାଧୀନ ଓଡ଼ିଆ ଦୈନିକ";
 const description =
-  "Clear, unhurried reporting on world affairs, business, technology, science and culture.";
+  "ରାଜ୍ୟ, ଦେଶ, ବ୍ୟବସାୟ, ପ୍ରଯୁକ୍ତି, ବିଜ୍ଞାନ ଓ ସଂସ୍କୃତି ଉପରେ ସ୍ପଷ୍ଟ ଓ ବିଶ୍ୱସ୍ତ ଓଡ଼ିଆ ଖବର।";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,7 +29,7 @@ function Home() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-5 py-10">
-        <h1 className="sr-only">The Meridian — today's headlines</h1>
+        <h1 className="sr-only">ମେରିଡିଆନ୍ ଖବର — ଆଜିର ମୁଖ୍ୟ ଶିରୋନାମା</h1>
 
         {lead && (
           <section className="grid gap-8 border-b border-border pb-10 lg:grid-cols-[1.4fr_1fr]">
@@ -48,7 +48,7 @@ function Home() {
               </h2>
               <p className="mt-3 max-w-2xl text-base text-muted-foreground">{lead.dek}</p>
               <p className="mt-3 text-xs text-muted-foreground">
-                {lead.author} · {formatDate(lead.date)} · {lead.readMinutes} min read
+                {lead.author} · {formatDate(lead.date)} · {lead.readMinutes} ମିନିଟ୍ ପଠନ
               </p>
             </Link>
 
@@ -75,7 +75,7 @@ function Home() {
 
         <section className="pt-10">
           <h2 className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-            More stories
+            ଅନ୍ୟ ଖବର
           </h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {remaining.map((a) => (

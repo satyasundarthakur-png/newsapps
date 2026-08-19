@@ -19,8 +19,8 @@
  */
 
 @theme inline {
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-sans: "Inter Tight", system-ui, sans-serif;
+  --font-serif: "Noto Serif Oriya", Georgia, serif;
+  --font-sans: "Noto Sans Oriya", system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
