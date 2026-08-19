@@ -7,6 +7,7 @@ export interface FeedArticle {
   summary: string;
   link: string;
   image: string | null;
+  imageDirect: string | null;
   pubDate: string; // ISO string, best-effort
   sourceId: SourceId;
   sourceName: string;
@@ -68,6 +69,20 @@ function absolutizeImageUrl(url: string): string | null {
   if (trimmed.startsWith("http://")) return `https://${trimmed.slice(7)}`;
   if (trimmed.startsWith("https://")) return trimmed;
   return null; // relative paths aren't usable without knowing the site root
+}
+
+// Jugad: route every image through wsrv.nl (formerly images.weserv.nl), a
+// free image cache/proxy widely used by RSS-aggregator projects for exactly
+// this problem. Most Indian news CDNs (and many WordPress sites) reject
+// direct hotlinking based on the Referer header, and some still serve over
+// plain http which browsers block as mixed content on an https deploy.
+// Routing through wsrv.nl sidesteps both: it fetches server-side with its
+// own referrer, always re-serves over https, and caches on Cloudflare so
+// repeat views are fast. &n=-1 disables their "not found" placeholder so a
+// failed fetch surfaces as a normal <img> error we can catch client-side.
+function proxyImage(url: string): string {
+  const stripped = url.replace(/^https?:\/\//, "");
+  return `https://wsrv.nl/?url=${encodeURIComponent(stripped)}&w=800&q=80&output=webp&n=-1`;
 }
 
 // Handles the handful of shapes publishers actually use: MRSS media:content
@@ -174,6 +189,7 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
             : ((item["link"] as Record<string, unknown>)?.["@_href"] as string) ||
               String(item["link"] ?? source.homepage);
         const title = stripHtml(String(item["title"] ?? ""));
+        const rawImage = findImage(item);
         return {
           id: `${source.id}-${idx}-${link}`,
           title,
@@ -186,7 +202,8 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
             title,
           ),
           link,
-          image: findImage(item),
+          image: rawImage ? proxyImage(rawImage) : null,
+          imageDirect: rawImage,
           pubDate: parseDate(item["pubDate"] ?? item["published"] ?? item["updated"]),
           sourceId: source.id,
           sourceName: source.name,

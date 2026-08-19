@@ -4,8 +4,18 @@ import { timeAgoOdia } from "@/lib/time-ago";
 
 export function NewsCard({ article, size = "normal" }: { article: FeedArticle; size?: "lead" | "normal" }) {
   const isLead = size === "lead";
-  const [imageFailed, setImageFailed] = useState(false);
-  const showImage = Boolean(article.image) && !imageFailed;
+  // Try the proxied (wsrv.nl) URL first — it sidesteps hotlink/referrer
+  // checks and mixed-content blocks. If that ever fails, fall back to the
+  // publisher's direct URL before giving up to the placeholder box.
+  const [stage, setStage] = useState<"proxy" | "direct" | "failed">("proxy");
+  const src =
+    stage === "proxy" ? article.image : stage === "direct" ? article.imageDirect : null;
+  const showImage = Boolean(src);
+
+  const handleError = () => {
+    if (stage === "proxy" && article.imageDirect) setStage("direct");
+    else setStage("failed");
+  };
 
   return (
     <a
@@ -16,12 +26,12 @@ export function NewsCard({ article, size = "normal" }: { article: FeedArticle; s
     >
       {showImage ? (
         <img
-          src={article.image!}
+          src={src!}
           alt={article.title}
           loading={isLead ? "eager" : "lazy"}
           referrerPolicy="no-referrer"
           className={`w-full rounded-sm object-cover ${isLead ? "aspect-[16/9]" : "aspect-[4/3]"}`}
-          onError={() => setImageFailed(true)}
+          onError={handleError}
         />
       ) : (
         <div
