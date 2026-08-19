@@ -10,116 +10,116 @@ export type Article = {
   image: string;
 };
 
-export const categories = ["World", "Business", "Technology", "Science", "Culture"] as const;
+export const categories = ["ରାଜ୍ୟ", "ଦେଶ", "ବ୍ୟବସାୟ", "ପ୍ରଯୁକ୍ତି", "ବିଜ୍ଞାନ", "ସଂସ୍କୃତି"] as const;
 
 export const articles: Article[] = [
   {
-    slug: "coastal-cities-rewrite-flood-playbook",
-    title: "Coastal cities rewrite the flood playbook",
-    dek: "Engineers are trading concrete seawalls for marshland, oyster reefs and streets designed to soak.",
+    slug: "upakula-sahara-banya-jojana",
+    title: "ଉପକୂଳ ସହରମାନେ ବଢ଼ୁଥିବା ପାଣିକୁ ନେଇ ନୂଆ ଯୋଜନା କରୁଛନ୍ତି",
+    dek: "କଂକ୍ରିଟ ପାଚେରୀ ବଦଳରେ ଇଞ୍ଜିନିୟରମାନେ ଏବେ ଚିଲିକା ପରି ଜଳାଶୟ, ମାଙ୍ଗ୍ରୋଭ ଓ ପାଣି ଶୋଷିବା ରାସ୍ତା ଉପରେ ଭରସା କରୁଛନ୍ତି।",
     body: [
-      "For decades the answer to rising water was to build higher. Now planners in a dozen port cities are betting on something softer: land that absorbs instead of deflects.",
-      "The shift is partly economic. Restored wetlands cost a fraction of hardened barriers and keep working as sea levels climb, while concrete needs replacement within a generation.",
-      "Early results are mixed but promising. In pilot districts, peak flood depth fell by nearly a third during last winter's storms, and residents reported far shorter road closures.",
+      "ଦଶନ୍ଧି ଧରି ପାଣି ବଢ଼ିଲେ ଆହୁରି ଉଚ୍ଚ ପାଚେରୀ ତିଆରି କରିବାର ପରମ୍ପରା ଥିଲା। ଏବେ ଅନେକ ବନ୍ଦର ସହରର ଯୋଜନାକାରୀ ନରମ ସମାଧାନ ଖୋଜୁଛନ୍ତି — ଏମିତି ଜମି ଯାହା ପାଣିକୁ ଠେଲିବା ବଦଳରେ ଶୋଷିନେବ।",
+      "ଏହି ପରିବର୍ତ୍ତନର ଏକ ବଡ଼ କାରଣ ଅର୍ଥନୈତିକ। ପୁନରୁଦ୍ଧାର ହୋଇଥିବା ଜଳାଭୂମି କଂକ୍ରିଟ ପାଚେରୀ ତୁଳନାରେ ବହୁତ କମ୍ ଖର୍ଚ୍ଚରେ ତିଆରି ହୁଏ ଏବଂ ସମୁଦ୍ର ପତ୍ତନ ବଢ଼ିଲେ ମଧ୍ୟ କାମ କରିଚାଲେ।",
+      "ପ୍ରାରମ୍ଭିକ ଫଳାଫଳ ଆଶାଜନକ। ପାଇଲଟ ଅଞ୍ଚଳରେ ଗତ ବର୍ଷାଦିନେ ବନ୍ୟା ଜଳର ଉଚ୍ଚତା ପ୍ରାୟ ଏକ ତୃତୀୟାଂଶ କମିଥିଲା ଏବଂ ରାସ୍ତା ବନ୍ଦ ରହିବାର ସମୟ ମଧ୍ୟ କମିଥିଲା।",
     ],
-    category: "Science",
-    author: "Marta Ibarra",
+    category: "ବିଜ୍ଞାନ",
+    author: "ମମତା ପଣ୍ଡା",
     date: "2026-08-19",
     readMinutes: 6,
     image:
       "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1600&q=70",
   },
   {
-    slug: "chip-makers-chase-smaller-factories",
-    title: "Chip makers chase smaller, stranger factories",
-    dek: "The next fabrication boom may be measured in modules, not megaplants.",
+    slug: "chip-karkhana-sanana-hela",
+    title: "ଚିପ୍ କାରଖାନା ଏବେ ଛୋଟ ଓ ଦ୍ରୁତ ହେବାକୁ ଚାହୁଁଛି",
+    dek: "ପରବର୍ତ୍ତୀ ଉତ୍ପାଦନ ଉତ୍ଥାନ ବିରାଟ କାରଖାନାରେ ନୁହେଁ, ମଡ୍ୟୁଲରେ ମାପାଯିବ।",
     body: [
-      "After a half-decade of record capital spending, several manufacturers are quietly funding compact plants that can be assembled in under two years.",
-      "The strategy trades scale for speed, letting suppliers place capacity near customers rather than in a handful of global hubs.",
-      "Analysts caution that yields at smaller sites remain unproven, and the economics only work if demand for specialty chips holds.",
+      "ପାଞ୍ଚ ବର୍ଷର ରେକର୍ଡ ପୁଞ୍ଜିନିବେଶ ପରେ ଅନେକ ଉତ୍ପାଦକ ଏବେ ଦୁଇ ବର୍ଷ ଭିତରେ ପ୍ରସ୍ତୁତ ହୋଇପାରୁଥିବା ଛୋଟ ପ୍ଲାଣ୍ଟରେ ଟଙ୍କା ଲଗାଉଛନ୍ତି।",
+      "ଏହି ରଣନୀତି ଆକାର ବଦଳରେ ଗତି ଉପରେ ଗୁରୁତ୍ୱ ଦିଏ, ଯାହା ଯୋଗାଣକାରୀଙ୍କୁ ଗ୍ରାହକଙ୍କ ପାଖରେ କ୍ଷମତା ସ୍ଥାପନ କରିବାକୁ ସୁଯୋଗ ଦିଏ।",
+      "ବିଶ୍ଳେଷକମାନେ କହୁଛନ୍ତି ଯେ ଛୋଟ କାରଖାନାରେ ଉତ୍ପାଦନ ଗୁଣବତ୍ତା ଏବେ ବି ପ୍ରମାଣିତ ହୋଇନାହିଁ।",
     ],
-    category: "Business",
-    author: "Devon Hale",
+    category: "ବ୍ୟବସାୟ",
+    author: "ଦେବାଶିଷ ସାହୁ",
     date: "2026-08-18",
     readMinutes: 5,
     image:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    slug: "a-quiet-revolution-in-language-models",
-    title: "A quiet revolution in small language models",
-    dek: "Researchers are proving that tightly curated data can beat raw scale on narrow tasks.",
+    slug: "sana-bhasa-model-ra-nirab-biplaba",
+    title: "ଛୋଟ ଭାଷା ମଡେଲରେ ଏକ ନୀରବ ବିପ୍ଳବ",
+    dek: "ଗବେଷକମାନେ ଦେଖାଉଛନ୍ତି ଯେ ଯତ୍ନରେ ବଛା ତଥ୍ୟ ବଡ଼ ଆକାରକୁ ହରାଇ ପାରେ।",
     body: [
-      "The headline numbers still belong to the largest systems, but a growing body of work shows carefully filtered training sets closing the gap at a fraction of the cost.",
-      "For teams running models on laptops and phones, that difference is decisive.",
-      "The open question is generalization: models tuned for one domain still stumble the moment the task shifts.",
+      "ବଡ଼ ସିଷ୍ଟମ ପାଖରେ ଏବେ ବି ମୁଖ୍ୟ ସଂଖ୍ୟା ରହିଛି, ମାତ୍ର ଯତ୍ନରେ ଛଣା ତାଲିମ ତଥ୍ୟ ଅନେକ କାମରେ ସେହି ବ୍ୟବଧାନ ପୂରଣ କରୁଛି।",
+      "ଲାପଟପ୍ ଓ ମୋବାଇଲରେ ମଡେଲ ଚଲାଉଥିବା ଦଳ ପାଇଁ ଏହି ପାର୍ଥକ୍ୟ ବହୁତ ବଡ଼।",
+      "ପ୍ରଶ୍ନ ରହିଛି ସାଧାରଣୀକରଣର — ଗୋଟିଏ କ୍ଷେତ୍ର ପାଇଁ ତିଆରି ମଡେଲ ଅନ୍ୟ କାମରେ ଏବେ ବି ଅଟକି ଯାଉଛି।",
     ],
-    category: "Technology",
-    author: "Priya Raman",
+    category: "ପ୍ରଯୁକ୍ତି",
+    author: "ପ୍ରିୟଙ୍କା ମହାନ୍ତି",
     date: "2026-08-18",
     readMinutes: 4,
     image:
       "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    slug: "the-long-road-back-to-the-night-train",
-    title: "The long road back to the night train",
-    dek: "Sleeper routes are returning across the continent, one carriage at a time.",
+    slug: "ratri-train-ra-punaragamana",
+    title: "ରାତ୍ରି ଟ୍ରେନର ପୁନରାଗମନ",
+    dek: "ଶୋଇବା କୋଚ୍ ଥିବା ରୁଟ୍ ଧୀରେ ଧୀରେ ଫେରୁଛି — ଗୋଟିଏ ଗୋଟିଏ ବଗି ଧରି।",
     body: [
-      "Operators retired most overnight services two decades ago. Passenger demand, and a distaste for short-haul flights, has pulled them back.",
-      "Rolling stock is the bottleneck: new sleeper cars take years to deliver, so most routes run refurbished fleets.",
-      "Where services returned, occupancy has averaged above eighty percent on weekends.",
+      "ଦୁଇ ଦଶନ୍ଧି ପୂର୍ବେ ଅଧିକାଂଶ ରାତ୍ରି ସେବା ବନ୍ଦ ହୋଇଯାଇଥିଲା। ଯାତ୍ରୀ ଚାହିଦା ଓ ଛୋଟ ଉଡ଼ାଣ ପ୍ରତି ଅନାଗ୍ରହ ସେଗୁଡ଼ିକୁ ଫେରାଇ ଆଣିଛି।",
+      "ମୁଖ୍ୟ ବାଧା ହେଉଛି ବଗି ଯୋଗାଣ; ନୂଆ ସ୍ଲିପର କୋଚ୍ ଆସିବାକୁ ବର୍ଷ ବର୍ଷ ଲାଗେ।",
+      "ଯେଉଁଠି ସେବା ଫେରିଛି, ସପ୍ତାହାନ୍ତରେ ଆସନ ପୂରଣ ହାର ଅଶୀ ପ୍ରତିଶତରୁ ଅଧିକ ରହିଛି।",
     ],
-    category: "World",
-    author: "Jonas Feld",
+    category: "ଦେଶ",
+    author: "ଜ୍ୟୋତି ରଣା",
     date: "2026-08-17",
     readMinutes: 7,
     image:
       "https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    slug: "museums-experiment-with-open-storage",
-    title: "Museums experiment with open storage",
-    dek: "Institutions are putting the other ninety percent of their collections on view.",
+    slug: "sangrahalaya-khola-bhandara",
+    title: "ସଂଗ୍ରହାଳୟମାନେ ଖୋଲା ଭଣ୍ଡାର ପରୀକ୍ଷା କରୁଛନ୍ତି",
+    dek: "ସଂଗ୍ରହର ବାକି ନବେ ପ୍ରତିଶତ ଏବେ ଦର୍ଶକଙ୍କ ଆଗରେ ରଖାଯାଉଛି।",
     body: [
-      "Most museums display a sliver of what they hold. Glass-walled storage halls are changing that calculus.",
-      "Curators describe the format as humbling: objects appear without narrative scaffolding, in dense rows.",
-      "Visitor surveys suggest audiences stay longer, even without wall text to guide them.",
+      "ଅଧିକାଂଶ ସଂଗ୍ରହାଳୟ ନିଜ ସଂଗ୍ରହର ଅତି ଅଳ୍ପ ଅଂଶ ପ୍ରଦର୍ଶନ କରନ୍ତି। କାଚ ଘେରା ଭଣ୍ଡାର ଏହି ହିସାବ ବଦଳାଉଛି।",
+      "କ୍ୟୁରେଟରମାନେ କହୁଛନ୍ତି ଏହି ଢାଞ୍ଚା ନମ୍ର କରିଦିଏ — ବସ୍ତୁ ବିନା ବ୍ୟାଖ୍ୟାରେ, ଧାଡ଼ି ଧାଡ଼ି ହୋଇ ଦେଖାଯାଏ।",
+      "ସର୍ଭେ କହୁଛି ଦର୍ଶକମାନେ ଅଧିକ ସମୟ ରହୁଛନ୍ତି।",
     ],
-    category: "Culture",
-    author: "Lena Osei",
+    category: "ସଂସ୍କୃତି",
+    author: "ଲିପିକା ବେହେରା",
     date: "2026-08-16",
     readMinutes: 5,
     image:
       "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    slug: "grid-operators-learn-to-love-batteries",
-    title: "Grid operators learn to love batteries",
-    dek: "Storage has moved from pilot project to the cheapest way to keep the lights on at dusk.",
+    slug: "grid-batery-bhabisyata",
+    title: "ବିଦ୍ୟୁତ୍ ଗ୍ରିଡ୍ ପାଇଁ ବ୍ୟାଟେରୀ ଏବେ ସବୁଠାରୁ ସସ୍ତା ସମାଧାନ",
+    dek: "ସନ୍ଧ୍ୟା ସମୟର ଚାହିଦା ପୂରଣ ପାଇଁ ଭଣ୍ଡାରଣ ପାଇଲଟରୁ ମୁଖ୍ୟ ଧାରାକୁ ଆସିଛି।",
     body: [
-      "Battery installations passed a symbolic threshold this year, supplying more evening peak capacity than gas peakers in several regions.",
-      "Operators say the change is as much software as hardware: forecasting tools now dispatch storage hours ahead.",
-      "Supply chains remain the limiting factor, with cell deliveries booked well into next year.",
+      "ଏହି ବର୍ଷ ବ୍ୟାଟେରୀ ସ୍ଥାପନା ଏକ ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ସୀମା ପାର କରିଛି — ଅନେକ ଅଞ୍ଚଳରେ ସନ୍ଧ୍ୟା ପିକ୍ ସମୟରେ ଗ୍ୟାସ ପ୍ଲାଣ୍ଟଠାରୁ ଅଧିକ ବିଦ୍ୟୁତ୍ ଯୋଗାଉଛି।",
+      "ଅପରେଟରମାନେ କହୁଛନ୍ତି ଏହା ଯନ୍ତ୍ରପାତି ଅପେକ୍ଷା ସଫ୍ଟୱେୟାରର ସଫଳତା।",
+      "ଯୋଗାଣ ଶୃଙ୍ଖଳା ଏବେ ବି ମୁଖ୍ୟ ପ୍ରତିବନ୍ଧକ ହୋଇ ରହିଛି।",
     ],
-    category: "Business",
-    author: "Ana Duarte",
+    category: "ବ୍ୟବସାୟ",
+    author: "ଅନ୍ୱେଷା ଦାଶ",
     date: "2026-08-15",
     readMinutes: 4,
     image:
       "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    slug: "mapping-the-deep-sea-in-high-resolution",
-    title: "Mapping the deep sea in high resolution",
-    dek: "A fleet of autonomous vessels has charted more seabed this year than the prior decade.",
+    slug: "gabhira-samudra-manachitra",
+    title: "ଗଭୀର ସମୁଦ୍ରର ଉଚ୍ଚ ରେଜୋଲ୍ୟୁସନ ମାନଚିତ୍ର",
+    dek: "ସ୍ୱୟଂଚାଳିତ ଜାହାଜ ଏହି ବର୍ଷ ଗତ ଦଶନ୍ଧିଠାରୁ ଅଧିକ ସମୁଦ୍ର ତଳ ମାପିଛନ୍ତି।",
     body: [
-      "Uncrewed surface vessels can stay out for weeks, running survey lines that once required a full ship's crew.",
-      "The resulting maps are already redrawing assumptions about undersea currents and cable routes.",
-      "Scientists warn that coverage remains uneven, concentrated near shipping lanes and planned infrastructure.",
+      "ଚାଳକବିହୀନ ଜଳଯାନ ସପ୍ତାହ ସପ୍ତାହ ଧରି ସର୍ଭେ କରିପାରନ୍ତି, ଯାହା ପୂର୍ବରୁ ପୂରା କ୍ରୁ ଆବଶ୍ୟକ କରୁଥିଲା।",
+      "ଏହି ମାନଚିତ୍ର ସମୁଦ୍ର ସ୍ରୋତ ଓ କେବୁଲ ମାର୍ଗ ସମ୍ପର୍କରେ ପୁରୁଣା ଧାରଣା ବଦଳାଉଛି।",
+      "ବୈଜ୍ଞାନିକମାନେ ସତର୍କ କରୁଛନ୍ତି ଯେ କଭରେଜ ଏବେ ବି ଅସମାନ ରହିଛି।",
     ],
-    category: "Science",
-    author: "Tomas Reid",
+    category: "ବିଜ୍ଞାନ",
+    author: "ସୌମ୍ୟ ପଟ୍ଟନାୟକ",
     date: "2026-08-14",
     readMinutes: 6,
     image:
@@ -131,11 +131,22 @@ export function getArticle(slug: string): Article | undefined {
   return articles.find((a) => a.slug === slug);
 }
 
+const ODIA_MONTHS = [
+  "ଜାନୁଆରୀ",
+  "ଫେବ୍ରୁଆରୀ",
+  "ମାର୍ଚ୍ଚ",
+  "ଅପ୍ରେଲ",
+  "ମଇ",
+  "ଜୁନ",
+  "ଜୁଲାଇ",
+  "ଅଗଷ୍ଟ",
+  "ସେପ୍ଟେମ୍ବର",
+  "ଅକ୍ଟୋବର",
+  "ନଭେମ୍ବର",
+  "ଡିସେମ୍ବର",
+];
+
 export function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  const d = new Date(`${iso}T00:00:00Z`);
+  return `${d.getUTCDate()} ${ODIA_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
