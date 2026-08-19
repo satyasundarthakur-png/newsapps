@@ -44,10 +44,13 @@ export function NewsCard({ article, size = "normal" }: { article: FeedArticle; s
         {article.title}
       </h3>
       {article.summary && (
-        <p className={`mt-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "line-clamp-2 text-sm"}`}>
+        <p className={`mt-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "line-clamp-3 text-sm"}`}>
           {article.summary}
         </p>
       )}
+      <span className="mt-2 inline-block text-[11px] font-medium text-muted-foreground/70 underline-offset-2 group-hover:underline">
+        ମୂଳ ଖବର ପଢ଼ନ୍ତୁ →
+      </span>
     </a>
   );
 }

@@ -28,13 +28,37 @@ function stripHtml(html: string | undefined): string {
   if (!html) return "";
   return html
     .replace(/<!\[CDATA\[|\]\]>/g, "")
+    .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#0?39;/g, "'")
+    .replace(/&mdash;/g, "—")
+    .replace(/&ndash;/g, "–")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+// Picks the longest usable plain-text excerpt across the fields a feed might
+// populate, then trims to a whole-word boundary near maxLen so cards get a
+// real summary instead of just a headline + photo.
+function bestSummary(
+  fields: Array<string | undefined>,
+  title: string,
+  maxLen = 260,
+): string {
+  const candidates = fields
+    .map((f) => stripHtml(f))
+    .filter((t) => t.length > 0 && t.toLowerCase() !== title.toLowerCase())
+    .sort((a, b) => b.length - a.length);
+
+  const text = candidates[0] ?? "";
+  if (text.length <= maxLen) return text;
+
+  const cut = text.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${cut.slice(0, lastSpace > 0 ? lastSpace : maxLen)}…`;
 }
 
 function findImage(item: Record<string, unknown>): string | null {
@@ -42,11 +66,11 @@ function findImage(item: Record<string, unknown>): string | null {
   if (media?.["@_url"]) return String(media["@_url"]);
   const thumb = item["media:thumbnail"] as Record<string, unknown> | undefined;
   if (thumb?.["@_url"]) return String(thumb["@_url"]);
-  const enclosure = item.enclosure as Record<string, unknown> | undefined;
+  const enclosure = item["enclosure"] as Record<string, unknown> | undefined;
   if (enclosure?.["@_url"]) return String(enclosure["@_url"]);
-  const desc = String(item["content:encoded"] ?? item.description ?? "");
+  const desc = String(item["content:encoded"] ?? item["description"] ?? "");
   const match = /<img[^>]+src="([^">]+)"/.exec(desc);
-  return match ? match[1] : null;
+  return match ? match[1]! : null;
 }
 
 function parseDate(raw: unknown): string {
@@ -92,19 +116,25 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
 
       return items.slice(0, 15).map((item, idx): FeedArticle => {
         const link =
-          typeof item.link === "string"
-            ? item.link
-            : ((item.link as Record<string, unknown>)?.["@_href"] as string) ||
-              String(item.link ?? source.homepage);
+          typeof item["link"] === "string"
+            ? (item["link"] as string)
+            : ((item["link"] as Record<string, unknown>)?.["@_href"] as string) ||
+              String(item["link"] ?? source.homepage);
+        const title = stripHtml(String(item["title"] ?? ""));
         return {
           id: `${source.id}-${idx}-${link}`,
-          title: stripHtml(String(item.title ?? "")),
-          summary: stripHtml(
-            String(item.description ?? item["content:encoded"] ?? item.summary ?? ""),
-          ).slice(0, 200),
+          title,
+          summary: bestSummary(
+            [
+              item["description"] as string | undefined,
+              item["content:encoded"] as string | undefined,
+              item["summary"] as string | undefined,
+            ],
+            title,
+          ),
           link,
           image: findImage(item),
-          pubDate: parseDate(item.pubDate ?? item.published ?? item.updated),
+          pubDate: parseDate(item["pubDate"] ?? item["published"] ?? item["updated"]),
           sourceId: source.id,
           sourceName: source.name,
           sourceShort: source.shortName,
@@ -124,7 +154,9 @@ export async function fetchAllNews(): Promise<{
   failedSources: string[];
 }> {
   const results = await Promise.all(SOURCES.map((s) => fetchSourceArticles(s)));
-  const failedSources = SOURCES.filter((_, i) => results[i].length === 0).map((s) => s.shortName);
+  const failedSources = SOURCES.filter((_, i) => (results[i]?.length ?? 0) === 0).map(
+    (s) => s.shortName,
+  );
   const articles = results
     .flat()
     .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
