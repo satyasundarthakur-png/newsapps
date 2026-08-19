@@ -1,12 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { articles, formatDate } from "@/data/articles";
+import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+import { getNews } from "@/server-fns/news";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { NewsCard } from "@/components/news-card";
+import type { SourceId } from "@/data/sources";
 
-const title = "ମେରିଡିଆନ୍ ଖବର — ସ୍ୱାଧୀନ ଓଡ଼ିଆ ଦୈନିକ";
+const title = "ମେରିଡିଆନ୍ ଖବର — ଏକ ସ୍ଥାନରେ ସବୁ ଓଡ଼ିଆ ଖବର";
 const description =
-  "ରାଜ୍ୟ, ଦେଶ, ବ୍ୟବସାୟ, ପ୍ରଯୁକ୍ତି, ବିଜ୍ଞାନ ଓ ସଂସ୍କୃତି ଉପରେ ସ୍ପଷ୍ଟ ଓ ବିଶ୍ୱସ୍ତ ଓଡ଼ିଆ ଖବର।";
+  "OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ ଓ କଳିଙ୍ଗ ଟିଭିଙ୍କ ଲାଇଭ୍ ଖବର ଏକାଠି।";
+
+const searchSchema = z.object({
+  source: z.string().optional().default("all"),
+});
 
 export const Route = createFileRoute("/")({
+  validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ source: search.source }),
+  loader: async ({ deps }) => {
+    const result = await getNews({ data: deps.source as SourceId | "all" });
+    return result;
+  },
   head: () => ({
     meta: [
       { title },
@@ -21,87 +34,56 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const { articles, failedSources } = Route.useLoaderData();
+  const { source } = Route.useSearch();
+
   const [lead, ...rest] = articles;
   const secondary = rest.slice(0, 2);
   const remaining = rest.slice(2);
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
+      <SiteHeader activeSource={source} />
       <main className="mx-auto max-w-6xl px-5 py-10">
         <h1 className="sr-only">ମେରିଡିଆନ୍ ଖବର — ଆଜିର ମୁଖ୍ୟ ଶିରୋନାମା</h1>
 
+        {failedSources.length > 0 && (
+          <p className="mb-6 rounded-md bg-muted px-4 py-2 text-xs text-muted-foreground">
+            {failedSources.join(", ")} ର ଖବର ବର୍ତ୍ତମାନ ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଅନ୍ୟ ଉତ୍ସର ଖବର ଦେଖାଯାଉଛି।
+          </p>
+        )}
+
+        {articles.length === 0 && (
+          <p className="py-20 text-center text-muted-foreground">
+            ବର୍ତ୍ତମାନ କୌଣସି ଖବର ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଦୟାକରି ପରେ ଚେଷ୍ଟା କରନ୍ତୁ।
+          </p>
+        )}
+
         {lead && (
           <section className="grid gap-8 border-b border-border pb-10 lg:grid-cols-[1.4fr_1fr]">
-            <Link to="/article/$slug" params={{ slug: lead.slug }} className="group block">
-              <img
-                src={lead.image}
-                alt={lead.title}
-                loading="eager"
-                className="aspect-[16/9] w-full rounded-sm object-cover"
-              />
-              <p className="mt-5 text-xs uppercase tracking-[0.2em] text-destructive">
-                {lead.category}
-              </p>
-              <h2 className="mt-2 font-serif text-3xl leading-tight font-bold tracking-tight group-hover:underline sm:text-4xl">
-                {lead.title}
-              </h2>
-              <p className="mt-3 max-w-2xl text-base text-muted-foreground">{lead.dek}</p>
-              <p className="mt-3 text-xs text-muted-foreground">
-                {lead.author} · {formatDate(lead.date)} · {lead.readMinutes} ମିନିଟ୍ ପଠନ
-              </p>
-            </Link>
-
+            <NewsCard article={lead} size="lead" />
             <div className="flex flex-col divide-y divide-border border-t border-border lg:border-t-0 lg:border-l lg:pl-8">
               {secondary.map((a) => (
-                <Link
-                  key={a.slug}
-                  to="/article/$slug"
-                  params={{ slug: a.slug }}
-                  className="group block py-5 first:pt-0 lg:first:pt-0"
-                >
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    {a.category}
-                  </p>
-                  <h3 className="mt-2 font-serif text-xl leading-snug font-semibold group-hover:underline">
-                    {a.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{a.dek}</p>
-                </Link>
+                <div key={a.id} className="py-5 first:pt-0 lg:first:pt-0">
+                  <NewsCard article={a} />
+                </div>
               ))}
             </div>
           </section>
         )}
 
-        <section className="pt-10">
-          <h2 className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-            ଅନ୍ୟ ଖବର
-          </h2>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {remaining.map((a) => (
-              <Link
-                key={a.slug}
-                to="/article/$slug"
-                params={{ slug: a.slug }}
-                className="group block"
-              >
-                <img
-                  src={a.image}
-                  alt={a.title}
-                  loading="lazy"
-                  className="aspect-[4/3] w-full rounded-sm object-cover"
-                />
-                <p className="mt-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  {a.category}
-                </p>
-                <h3 className="mt-1 font-serif text-lg leading-snug font-semibold group-hover:underline">
-                  {a.title}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">{a.dek}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {remaining.length > 0 && (
+          <section className="pt-10">
+            <h2 className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+              ଅନ୍ୟ ଖବର
+            </h2>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {remaining.map((a) => (
+                <NewsCard key={a.id} article={a} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <SiteFooter />
     </div>
