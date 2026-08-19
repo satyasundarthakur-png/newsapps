@@ -61,16 +61,69 @@ function bestSummary(
   return `${cut.slice(0, lastSpace > 0 ? lastSpace : maxLen)}…`;
 }
 
+function absolutizeImageUrl(url: string): string | null {
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  if (trimmed.startsWith("http://")) return `https://${trimmed.slice(7)}`;
+  if (trimmed.startsWith("https://")) return trimmed;
+  return null; // relative paths aren't usable without knowing the site root
+}
+
+// Handles the handful of shapes publishers actually use: MRSS media:content
+// (possibly an array or nested in media:group), media:thumbnail, RSS
+// <enclosure>, the classic NewsAPI-style <image><url>, and — the most common
+// case for WordPress-based Odia sites — an <img> tag buried inside
+// content:encoded or description with no dedicated image field at all.
 function findImage(item: Record<string, unknown>): string | null {
-  const media = item["media:content"] as Record<string, unknown> | undefined;
-  if (media?.["@_url"]) return String(media["@_url"]);
-  const thumb = item["media:thumbnail"] as Record<string, unknown> | undefined;
-  if (thumb?.["@_url"]) return String(thumb["@_url"]);
-  const enclosure = item["enclosure"] as Record<string, unknown> | undefined;
-  if (enclosure?.["@_url"]) return String(enclosure["@_url"]);
+  const asFirst = (v: unknown): Record<string, unknown> | undefined =>
+    Array.isArray(v) ? (v[0] as Record<string, unknown>) : (v as Record<string, unknown> | undefined);
+
+  const media = asFirst(item["media:content"]);
+  if (media?.["@_url"]) {
+    const url = absolutizeImageUrl(String(media["@_url"]));
+    if (url) return url;
+  }
+
+  const mediaGroup = asFirst(item["media:group"]);
+  const groupedMedia = mediaGroup ? asFirst(mediaGroup["media:content"]) : undefined;
+  if (groupedMedia?.["@_url"]) {
+    const url = absolutizeImageUrl(String(groupedMedia["@_url"]));
+    if (url) return url;
+  }
+
+  const thumb = asFirst(item["media:thumbnail"]);
+  if (thumb?.["@_url"]) {
+    const url = absolutizeImageUrl(String(thumb["@_url"]));
+    if (url) return url;
+  }
+
+  const enclosure = asFirst(item["enclosure"]);
+  if (enclosure?.["@_url"]) {
+    const type = String(enclosure["@_type"] ?? "");
+    if (!type || type.startsWith("image/") || type === "") {
+      const url = absolutizeImageUrl(String(enclosure["@_url"]));
+      if (url) return url;
+    }
+  }
+
+  const imageTag = item["image"] as Record<string, unknown> | string | undefined;
+  if (imageTag && typeof imageTag === "object" && imageTag["url"]) {
+    const url = absolutizeImageUrl(String(imageTag["url"]));
+    if (url) return url;
+  } else if (typeof imageTag === "string") {
+    const url = absolutizeImageUrl(imageTag);
+    if (url) return url;
+  }
+
   const desc = String(item["content:encoded"] ?? item["description"] ?? "");
-  const match = /<img[^>]+src="([^">]+)"/.exec(desc);
-  return match ? match[1]! : null;
+  const match = /<img[^>]+src=["']([^"'>]+)["']/i.exec(desc);
+  if (match) {
+    const url = absolutizeImageUrl(match[1]!);
+    if (url) return url;
+  }
+
+  return null;
 }
 
 function parseDate(raw: unknown): string {

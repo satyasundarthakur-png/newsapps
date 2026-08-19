@@ -133,8 +133,10 @@ export const SOURCES: NewsSource[] = [
     homepage: "https://www.hindustantimes.com",
     group: "national",
     candidates: [
+      "https://www.hindustantimes.com/rss/latest-news/rssfeed.xml",
+      "https://www.hindustantimes.com/rss/india-news/rssfeed.xml",
       "https://www.hindustantimes.com/feeds/rss/latest/rssfeed.xml",
-      "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml",
+      "http://feeds.hindustantimes.com/HT-India",
     ],
     accent: "#0f766e",
   },

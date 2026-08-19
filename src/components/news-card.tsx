@@ -1,8 +1,12 @@
+import { useState } from "react";
 import type { FeedArticle } from "@/lib/rss.server";
 import { timeAgoOdia } from "@/lib/time-ago";
 
 export function NewsCard({ article, size = "normal" }: { article: FeedArticle; size?: "lead" | "normal" }) {
   const isLead = size === "lead";
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = Boolean(article.image) && !imageFailed;
+
   return (
     <a
       href={article.link}
@@ -10,15 +14,14 @@ export function NewsCard({ article, size = "normal" }: { article: FeedArticle; s
       rel="noopener noreferrer"
       className="group block"
     >
-      {article.image ? (
+      {showImage ? (
         <img
-          src={article.image}
+          src={article.image!}
           alt={article.title}
           loading={isLead ? "eager" : "lazy"}
+          referrerPolicy="no-referrer"
           className={`w-full rounded-sm object-cover ${isLead ? "aspect-[16/9]" : "aspect-[4/3]"}`}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
+          onError={() => setImageFailed(true)}
         />
       ) : (
         <div
