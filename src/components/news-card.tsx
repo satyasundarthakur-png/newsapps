@@ -13,34 +13,22 @@ export function NewsCard({
   const isLead = size === "lead";
   const slot = isLead ? IMAGE_SLOTS.lead : IMAGE_SLOTS.normal;
 
-  // Sized, right-slot proxy variant — built here (not stored server-side)
-  // so a lead card and a grid card showing the same article each request
-  // exactly the pixels they'll display, instead of sharing one arbitrary
-  // size. This is the fix for images being "not standardized, some real
-  // big": every card of a given kind now downloads the same dimensions.
+  // Every image, from every newspaper, is forced through this same sized
+  // proxy — no "try the publisher's own image first" shortcut. That
+  // shortcut was the reason images looked inconsistently sized across
+  // sources: feed-native images loaded at whatever resolution/aspect the
+  // publisher's own CDN happened to serve, only falling back to a
+  // standard size on error. Routing everything through wsrv.nl up front
+  // means every card of a given slot (lead/normal) always downloads and
+  // displays the exact same pixel dimensions, regardless of source.
   const sizedProxy = article.imageDirect
     ? wsrvUrl(article.imageDirect, slot.w, slot.h)
     : article.image;
-
-  // Backfilled images (og:image scrapes, WP featured images, microlink)
-  // have unpredictable origin and size — some publishers use a single
-  // multi-MB banner as their fallback og:image for every article — so
-  // those always go through the sized proxy and skip the direct URL
-  // entirely. Feed-native images (media:content, enclosure) are normally
-  // already sized sanely by the publisher's own CDN, so trying them
-  // directly first is a safe, faster default, falling back to the proxy
-  // only if that fails.
-  const tryDirectFirst = article.imageOrigin === "feed";
-  const [stage, setStage] = useState<"direct" | "proxy" | "failed">(
-    tryDirectFirst ? "direct" : "proxy",
-  );
-  const src = stage === "direct" ? article.imageDirect : stage === "proxy" ? sizedProxy : null;
+  const [failed, setFailed] = useState(false);
+  const src = !failed ? sizedProxy : null;
   const showImage = Boolean(src);
 
-  const handleError = () => {
-    if (stage === "direct" && sizedProxy) setStage("proxy");
-    else setStage("failed");
-  };
+  const handleError = () => setFailed(true);
 
   // Per-source tinted background: mixes each newspaper's accent color into
   // the theme's own background variable (not a flat white/black), so the
