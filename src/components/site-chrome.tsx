@@ -5,7 +5,7 @@ const GROUP_ORDER: SourceGroup[] = ["odia", "national", "international"];
 
 export function SiteHeader({ activeSource }: { activeSource?: string }) {
   return (
-    <header className="relative overflow-hidden border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="relative min-h-[220px] overflow-visible border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       {/* Thin rainbow accent stripe echoing the site's chart palette */}
       <div
         className="h-1 w-full"
