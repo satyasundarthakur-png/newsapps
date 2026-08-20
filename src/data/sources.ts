@@ -55,9 +55,9 @@ export const SOURCES: NewsSource[] = [
     homepage: "https://sambad.in",
     group: "odia",
     candidates: [
+      "https://sambad.in/rss",
       "https://sambad.in/feed/",
       "https://sambadnewspaper.com/feed/",
-      "https://sambad.in/rss.xml",
     ],
     accent: "#9f1239",
   },
