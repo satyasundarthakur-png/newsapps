@@ -63,7 +63,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-5 py-8 text-xs text-muted-foreground">
         © {new Date().getFullYear()} ମେରିଡିଆନ୍ ଖବର। ପ୍ରତ୍ୟେକ ଖବରର ସାରାଂଶ ମାତ୍ର ଏଠାରେ ଦେଖାଯାଏ — ଏହା
         OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ, କଳିଙ୍ଗ ଟିଭି, Times of India, Hindustan Times, Indian
-        Express, BBC, Al Jazeera ଓ Google News ଠାରୁ ସଂଗୃହିତ। ପୂର୍ଣ୍ଣ ଖବର ପାଇଁ ମୂଳ ଉତ୍ସକୁ ଯାଆନ୍ତୁ।
+        Express, BBC, Al Jazeera ଓ MSN/Bing News ଠାରୁ ସଂଗୃହିତ। ପୂର୍ଣ୍ଣ ଖବର ପାଇଁ ମୂଳ ଉତ୍ସକୁ ଯାଆନ୍ତୁ।
       </div>
     </footer>
   );

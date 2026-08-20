@@ -275,7 +275,7 @@ async function backfillMissingImages(articles: FeedArticle[], source: NewsSource
       batch.map(async (article) => {
         let found: string | null = null;
         if (source.wordpress) found = await fetchWpFeaturedImage(article.link);
-        if (!found && !source.noImages) found = await fetchOgImage(article.link);
+        if (!found) found = await fetchOgImage(article.link);
         if (!found) found = await fetchMicrolinkImage(article.link);
         if (found) {
           article.imageDirect = found;
@@ -329,7 +329,7 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
             : ((item["link"] as Record<string, unknown>)?.["@_href"] as string) ||
               String(item["link"] ?? source.homepage);
         const title = stripHtml(String(item["title"] ?? ""));
-        const rawImage = source.noImages ? null : findImage(item);
+        const rawImage = findImage(item);
         return {
           id: `${source.id}-${idx}-${link}`,
           title,

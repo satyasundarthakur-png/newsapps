@@ -10,7 +10,7 @@ export type SourceId =
   | "indianexpress"
   | "bbc"
   | "aljazeera"
-  | "googlenews";
+  | "msn";
 
 export type SourceGroup = "odia" | "national" | "international";
 
@@ -29,11 +29,6 @@ export interface NewsSource {
   // the structured wp-json REST API (more reliable than scraping HTML,
   // since it's less often behind anti-bot page challenges).
   wordpress?: boolean;
-  // Google News RSS structurally never includes thumbnails, and its <link>
-  // is an opaque redirect token that only resolves in a real browser (JS),
-  // not a plain server fetch — so trying to backfill an image for it is a
-  // guaranteed-wasted request. Skip the attempt entirely for such sources.
-  noImages?: boolean;
 }
 
 export const GROUP_LABELS: Record<SourceGroup, string> = {
@@ -187,17 +182,21 @@ export const SOURCES: NewsSource[] = [
     accent: "#92400e",
   },
   {
-    id: "googlenews",
-    name: "Google News (India)",
-    shortName: "Google News",
-    homepage: "https://news.google.com",
+    id: "msn",
+    name: "MSN / Bing News",
+    shortName: "MSN",
+    homepage: "https://www.msn.com",
     group: "international",
-    candidates: ["https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en"],
-    accent: "#4285F4",
-    // Google's RSS structurally omits thumbnails, and its <link> is an
-    // opaque redirect token that only resolves to the real article inside
-    // a browser (client-side JS), not a plain server fetch — so any
-    // backfill attempt here is a guaranteed-wasted request every time.
-    noImages: true,
+    // MSN itself has no public reader-facing RSS feed (it's a publisher
+    // ingestion platform — sites submit feeds *to* MSN, not the other way
+    // round). Bing News, also Microsoft, exposes a public search-RSS
+    // endpoint that — unlike Google News — links directly to the real
+    // publisher article and includes thumbnail images.
+    candidates: [
+      "https://www.bing.com/news/search?q=India&format=rss&setmkt=en-IN",
+      "https://www.bing.com/news/search?q=India&format=RSS",
+      "https://www.bing.com/news/search?q=top+news&format=rss",
+    ],
+    accent: "#008373",
   },
 ];
