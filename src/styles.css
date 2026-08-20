@@ -167,19 +167,25 @@
 }
 
 /* CSS-only spinning Earth doodle — a lighter alternative to the SVG
-   GlobeDoodle wireframe this replaced. Uses a self-generated world-map
-   texture (public/earth-map.svg, no external assets/licensing) instead of
-   a flat gradient, cropped to a circle. Sized via the --earth-size custom
-   property so it can be dropped in at any scale without a separate CSS
-   rule per size. Glow color kept as the teal ocean tone from the map
-   itself rather than the originally-pasted light-blue sky tone, so the
-   glow reads as "the ocean" rather than an unrelated color. */
+   GlobeDoodle wireframe this replaced. Uses the real NASA "Blue Marble"
+   Earth photograph (public/earth-photo.png — NASA imagery is a U.S.
+   government work and public domain, not subject to copyright) instead
+   of the earlier self-drawn vector map. A single photograph can't tile
+   seamlessly the way the vector map could, so this spins via
+   transform: rotate on the whole circle rather than panning a repeating
+   background — the "rotating like a wheel" look is an acceptable
+   trade-off for a real photo, and is what a spinning coin/medallion
+   treatment of a photographic image normally looks like anyway. Sized
+   via the --earth-size custom property so it can be dropped in at any
+   scale without a separate CSS rule per size. Source image is only
+   157x157 — a little soft at this element's typical display size, but
+   that's the resolution provided. */
 .earth-doodle {
-  width: var(--earth-size, 180px);
-  height: var(--earth-size, 180px);
+  width: var(--earth-size, 200px);
+  height: var(--earth-size, 200px);
   border-radius: 50%;
-  background: url("/earth-map.svg") no-repeat center / cover;
-  box-shadow: 0 0 25px color-mix(in oklch, oklch(0.536 0.089 205.032) 50%, transparent);
+  background: url("/earth-photo.png") no-repeat center / cover;
+  box-shadow: 0 0 30px color-mix(in oklch, oklch(0.536 0.089 205.032) 55%, transparent);
   animation: earth-spin 60s linear infinite;
   flex-shrink: 0;
 }
