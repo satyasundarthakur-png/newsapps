@@ -42,8 +42,23 @@ export function NewsCard({
     else setStage("failed");
   };
 
+  // Per-source tinted background: mixes each newspaper's accent color into
+  // the theme's own background variable (not a flat white/black), so the
+  // tint stays subtle and correct in both light and dark mode automatically.
+  const cardBg = `color-mix(in oklch, ${article.accent} 7%, var(--color-background))`;
+  const cardBgHover = `color-mix(in oklch, ${article.accent} 13%, var(--color-background))`;
+  const cardBorder = `color-mix(in oklch, ${article.accent} 30%, transparent)`;
+
   return (
-    <a href={article.link} target="_blank" rel="noopener noreferrer" className="group block">
+    <a
+      href={article.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block rounded-md border p-3 transition-colors"
+      style={{ backgroundColor: cardBg, borderColor: cardBorder }}
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = cardBgHover)}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = cardBg)}
+    >
       {showImage ? (
         <img
           src={src!}
