@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import { SOURCES, type NewsSource, type SourceId } from "@/data/sources";
+import { SOURCES, type NewsSource, type SourceId, type SourceGroup } from "@/data/sources";
 import { wsrvUrl, IMAGE_SLOTS } from "@/lib/image-proxy";
 
 export interface FeedArticle {
@@ -90,7 +90,11 @@ const summaryCache = new Map<string, string>();
 
 export function summarizeFeedItem(
   itemId: string,
-  fields: { description?: string | undefined; contentEncoded?: string | undefined; summary?: string | undefined },
+  fields: {
+    description?: string | undefined;
+    contentEncoded?: string | undefined;
+    summary?: string | undefined;
+  },
   title: string,
   maxLen = 500,
 ): string {
@@ -401,8 +405,7 @@ function parseJugadJson(json: unknown, source: NewsSource): FeedArticle[] {
     const r = row as Record<string, unknown>;
     const title = stripHtml(String(r["title"] ?? ""));
     const link = String(r["publisherStory"] ?? r["url"] ?? source.homepage);
-    const rawImage =
-      typeof r["imageUrl"] === "string" ? absolutizeImageUrl(r["imageUrl"]) : null;
+    const rawImage = typeof r["imageUrl"] === "string" ? absolutizeImageUrl(r["imageUrl"]) : null;
     return {
       id: `${source.id}-${idx}-${link}`,
       title,
@@ -506,11 +509,11 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
   return [];
 }
 
-export async function fetchAllNews(): Promise<{
+export async function fetchAllNews(group?: SourceGroup): Promise<{
   articles: FeedArticle[];
   failedSources: string[];
 }> {
-  const fetchable = SOURCES.filter((s) => !s.comingSoon);
+  const fetchable = SOURCES.filter((s) => !s.comingSoon && (!group || s.group === group));
   const results = await Promise.all(fetchable.map((s) => fetchSourceArticles(s)));
   const failedSources = fetchable
     .filter((_, i) => (results[i]?.length ?? 0) === 0)

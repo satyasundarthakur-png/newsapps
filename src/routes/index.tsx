@@ -5,7 +5,7 @@ import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { NewsCard } from "@/components/news-card";
 import { StatusCard } from "@/components/status-card";
 import { NewsGridSkeleton } from "@/components/loading";
-import type { SourceId } from "@/data/sources";
+import type { SourceGroup, SourceId } from "@/data/sources";
 
 const title = "ମେରିଡିଆନ୍ ଖବର — ଏକ ସ୍ଥାନରେ ସବୁ ଓଡ଼ିଆ ଖବର";
 const description = "OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ ଓ କଳିଙ୍ଗ ଟିଭିଙ୍କ ଲାଇଭ୍ ଖବର ଏକାଠି।";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => ({ source: search.source }),
   loader: async ({ deps }) => {
-    const result = await getNews({ data: deps.source as SourceId | "all" });
+    const result = await getNews({ data: deps.source as SourceId | SourceGroup | "all" });
     return result;
   },
   // Skeleton cards only show up on a client-side tab switch that's taking a

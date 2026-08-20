@@ -190,32 +190,45 @@
   to { transform: rotate(360deg); }
 }
 
-/* Underline-tab nav style for the top-level "ସବୁ" (All) selector — a
-   lighter, text-forward alternative to the filled rounded pills used for
-   individual publishers below it. Colors pull from the theme's primary/
-   muted-foreground tokens rather than the originally-pasted #b22222/#555
-   so it stays correct in dark mode automatically. */
-.news-section {
+/* Primary section-switcher tabs: ସବୁ / ଓଡ଼ିଶା / ଜାତୀୟ / ଆନ୍ତର୍ଜାତୀୟ. Colors
+   pull from theme tokens (var(--color-primary) for active, var(--color-
+   accent) for hover) rather than the originally-pasted #b22222/#1e90ff, so
+   it stays correct in dark mode. Font size/padding scale down under 640px
+   — the original fixed 1.3rem/1rem 2rem sizing works for a centered
+   4-item bar on desktop but four tabs at that size don't fit a phone
+   width, so mobile gets a smaller, tighter version of the same style
+   rather than wrapping or scrolling. */
+.section-tabs {
   display: flex;
-  justify-content: flex-start;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 2rem;
+  font-family: var(--font-sans);
 }
-.news-section a {
-  font-size: 0.875rem;
-  font-weight: 600;
+.section-tabs a {
+  font-size: 1.3rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
   color: var(--color-muted-foreground);
-  padding: 0.375rem 0.25rem;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s ease-in-out;
+  padding: 1rem 2rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease-in-out;
 }
-.news-section a.active {
+.section-tabs a.active {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
 }
-.news-section a:hover {
-  color: var(--color-primary);
+.section-tabs a:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+@media (max-width: 640px) {
+  .section-tabs {
+    gap: 0.5rem;
+  }
+  .section-tabs a {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.5rem;
+  }
 }
 
 /* Thin scrollbar for the mobile horizontally-scrolling source-pill rows —

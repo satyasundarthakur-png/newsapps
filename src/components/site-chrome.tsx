@@ -35,21 +35,17 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
         </div>
       </div>
 
-      {/* Sticky source selector: stays pinned under the browser chrome while
-          scrolling, so switching feeds never means scrolling back to the
-          top. On narrow screens each row scrolls horizontally instead of
-          wrapping, since a tall multi-row wrapped header eats too much of a
-          phone's viewport. */}
+      {/* Sticky section navigation: stays pinned under the browser chrome
+          while scrolling, so switching feeds never means scrolling back to
+          the top. The big centered tabs are a real filter — ସବୁ shows every
+          source, each group tab aggregates every source in that group
+          (fetched and merged server-side, same as ସବୁ but scoped) — not
+          just a label. The active tab also lights up when a specific
+          publisher within that group is selected below, so picking "OTV"
+          keeps you visually anchored under "ଓଡ଼ିଶା". */}
       <div className="sticky top-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-3">
-          {/* Top-level "All" tab uses the lighter underline-tab treatment —
-              text-forward, uppercase, active state marked by an underline
-              rather than a filled pill. The individual publisher pills
-              below stay filled/rounded on purpose: with names ranging from
-              "OTV" to "Hindustan Times" to "କଳିଙ୍ଗ ଟିଭି", uppercase
-              underlined text at that density reads worse than a colored
-              pill, especially at Odia-script sizes. */}
-          <nav className="news-section">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-3">
+          <nav className="section-tabs">
             <Link
               to="/"
               search={{ source: "all" }}
@@ -57,8 +53,25 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
             >
               ସବୁ
             </Link>
+            {GROUP_ORDER.map((group) => {
+              const sourceInGroup = SOURCES.find((s) => s.id === activeSource)?.group === group;
+              return (
+                <Link
+                  key={group}
+                  to="/"
+                  search={{ source: group }}
+                  className={activeSource === group || sourceInGroup ? "active" : undefined}
+                >
+                  {GROUP_LABELS[group]}
+                </Link>
+              );
+            })}
           </nav>
 
+          {/* Individual-publisher refinement rows, unchanged from before —
+              still the way to pick one specific source rather than a whole
+              group. Horizontally scrollable on mobile so this doesn't push
+              the sticky bar's height past a comfortable size. */}
           {GROUP_ORDER.map((group) => (
             <div
               key={group}
