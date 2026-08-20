@@ -1,5 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { SOURCES, type NewsSource, type SourceId } from "@/data/sources";
+import { wsrvUrl, IMAGE_SLOTS } from "@/lib/image-proxy";
 
 export interface FeedArticle {
   id: string;
@@ -8,6 +9,15 @@ export interface FeedArticle {
   link: string;
   image: string | null;
   imageDirect: string | null;
+  // "feed": came straight from the publisher's own RSS tags (media:content,
+  // enclosure, etc.) — these are normally already sized sanely by the
+  // publisher's own CDN, so trying the direct URL first is a safe, faster
+  // default. "backfill": scraped from an og:image tag, WP REST API, or
+  // microlink — origin and size are unpredictable (some publishers use a
+  // single huge 2-3MB banner as their fallback og:image for every article),
+  // so these should always go through the proxy at a fixed size rather than
+  // ever loading directly.
+  imageOrigin: "feed" | "backfill" | null;
   pubDate: string; // ISO string, best-effort
   sourceId: SourceId;
   sourceName: string;
@@ -44,11 +54,7 @@ function stripHtml(html: string | undefined): string {
 // Picks the longest usable plain-text excerpt across the fields a feed might
 // populate, then trims to a whole-word boundary near maxLen so cards get a
 // real summary instead of just a headline + photo.
-function bestSummary(
-  fields: Array<string | undefined>,
-  title: string,
-  maxLen = 260,
-): string {
+function bestSummary(fields: Array<string | undefined>, title: string, maxLen = 260): string {
   const candidates = fields
     .map((f) => stripHtml(f))
     .filter((t) => t.length > 0 && t.toLowerCase() !== title.toLowerCase())
@@ -78,11 +84,13 @@ function absolutizeImageUrl(url: string): string | null {
 // plain http which browsers block as mixed content on an https deploy.
 // Routing through wsrv.nl sidesteps both: it fetches server-side with its
 // own referrer, always re-serves over https, and caches on Cloudflare so
-// repeat views are fast. &n=-1 disables their "not found" placeholder so a
-// failed fetch surfaces as a normal <img> error we can catch client-side.
+// repeat views are fast. Sized to the "normal" grid slot as the stored
+// default — NewsCard re-derives a lead-sized variant client-side from
+// imageDirect when it renders in the lead slot, so both slots always get
+// consistently sized, appropriately compressed images instead of one
+// oversized asset stretched or squeezed into place.
 function proxyImage(url: string): string {
-  const stripped = url.replace(/^https?:\/\//, "");
-  return `https://wsrv.nl/?url=${encodeURIComponent(stripped)}&w=800&q=80&output=webp&n=-1`;
+  return wsrvUrl(url, IMAGE_SLOTS.normal.w, IMAGE_SLOTS.normal.h);
 }
 
 // Handles the handful of shapes publishers actually use: MRSS media:content
@@ -92,7 +100,9 @@ function proxyImage(url: string): string {
 // content:encoded or description with no dedicated image field at all.
 function findImage(item: Record<string, unknown>): string | null {
   const asFirst = (v: unknown): Record<string, unknown> | undefined =>
-    Array.isArray(v) ? (v[0] as Record<string, unknown>) : (v as Record<string, unknown> | undefined);
+    Array.isArray(v)
+      ? (v[0] as Record<string, unknown>)
+      : (v as Record<string, unknown> | undefined);
 
   const media = asFirst(item["media:content"]);
   if (media?.["@_url"]) {
@@ -226,27 +236,51 @@ async function fetchWpFeaturedImage(articleUrl: string): Promise<string | null> 
   }
 }
 
+// Jugad #4: microlink.io — a free-tier link-preview API that renders the
+// target page in an actual headless browser server-side, rather than doing
+// a plain fetch. This matters for two stubborn cases a raw fetch can't
+// handle: (a) pages sitting behind a JS-based anti-bot challenge that a
+// plain request never gets past, and (b) Google News' article links, which
+// are opaque redirect tokens that only resolve to the real publisher page
+// when followed by something that actually runs JavaScript. It's rate
+// limited on the free tier, so it's kept as the last resort after the
+// cheaper, more targeted attempts above have had a chance.
+async function fetchMicrolinkImage(articleUrl: string): Promise<string | null> {
+  try {
+    const api = `https://api.microlink.io/?url=${encodeURIComponent(articleUrl)}&image=true&meta=false`;
+    const res = await fetch(api, { signal: AbortSignal.timeout(9000) });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      data?: { image?: { url?: string }; logo?: { url?: string } };
+    };
+    const found = data.data?.image?.url ?? data.data?.logo?.url;
+    return found ? absolutizeImageUrl(found) : null;
+  } catch {
+    return null;
+  }
+}
+
 // Runs the image backfill for imageless articles a few at a time, so a
 // slow/dead publisher page can't stall the whole request. Capped to the
 // most recent items only — backfilling all 15 would add too much latency
-// for items further down the list that matter less anyway. Sources flagged
-// noImages (Google News) are skipped entirely: their feed structurally has
-// no thumbnails and their links are JS-only redirects, so any attempt here
-// is a guaranteed-wasted request.
+// for items further down the list that matter less anyway. Tries the
+// cheapest, most targeted method first and only escalates to microlink
+// (rate-limited, slower) when the earlier attempts come back empty.
 async function backfillMissingImages(articles: FeedArticle[], source: NewsSource): Promise<void> {
-  if (source.noImages) return;
   const needsImage = articles.filter((a) => !a.image).slice(0, 8);
-  const concurrency = 4;
+  const concurrency = 3;
   for (let i = 0; i < needsImage.length; i += concurrency) {
     const batch = needsImage.slice(i, i + concurrency);
     await Promise.all(
       batch.map(async (article) => {
-        const found = source.wordpress
-          ? (await fetchWpFeaturedImage(article.link)) ?? (await fetchOgImage(article.link))
-          : await fetchOgImage(article.link);
+        let found: string | null = null;
+        if (source.wordpress) found = await fetchWpFeaturedImage(article.link);
+        if (!found && !source.noImages) found = await fetchOgImage(article.link);
+        if (!found) found = await fetchMicrolinkImage(article.link);
         if (found) {
           article.imageDirect = found;
           article.image = proxyImage(found);
+          article.imageOrigin = "backfill";
         }
       }),
     );
@@ -310,6 +344,7 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
           link,
           image: rawImage ? proxyImage(rawImage) : null,
           imageDirect: rawImage,
+          imageOrigin: rawImage ? "feed" : null,
           pubDate: parseDate(item["pubDate"] ?? item["published"] ?? item["updated"]),
           sourceId: source.id,
           sourceName: source.name,

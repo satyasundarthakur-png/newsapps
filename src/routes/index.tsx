@@ -6,8 +6,7 @@ import { NewsCard } from "@/components/news-card";
 import type { SourceId } from "@/data/sources";
 
 const title = "ମେରିଡିଆନ୍ ଖବର — ଏକ ସ୍ଥାନରେ ସବୁ ଓଡ଼ିଆ ଖବର";
-const description =
-  "OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ ଓ କଳିଙ୍ଗ ଟିଭିଙ୍କ ଲାଇଭ୍ ଖବର ଏକାଠି।";
+const description = "OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ ଓ କଳିଙ୍ଗ ଟିଭିଙ୍କ ଲାଇଭ୍ ଖବର ଏକାଠି।";
 
 const searchSchema = z.object({
   source: z.string().optional().default("all"),
@@ -49,7 +48,8 @@ function Home() {
 
         {failedSources.length > 0 && (
           <p className="mb-6 rounded-md bg-muted px-4 py-2 text-xs text-muted-foreground">
-            {failedSources.join(", ")} ର ଖବର ବର୍ତ୍ତମାନ ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଅନ୍ୟ ଉତ୍ସର ଖବର ଦେଖାଯାଉଛି।
+            {failedSources.join(", ")} ର ଖବର ବର୍ତ୍ତମାନ ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଅନ୍ୟ ଉତ୍ସର ଖବର
+            ଦେଖାଯାଉଛି।
           </p>
         )}
 

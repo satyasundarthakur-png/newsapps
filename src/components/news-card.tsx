@@ -1,43 +1,61 @@
 import { useState } from "react";
 import type { FeedArticle } from "@/lib/rss.server";
 import { timeAgoOdia } from "@/lib/time-ago";
+import { wsrvUrl, IMAGE_SLOTS } from "@/lib/image-proxy";
 
-export function NewsCard({ article, size = "normal" }: { article: FeedArticle; size?: "lead" | "normal" }) {
+export function NewsCard({
+  article,
+  size = "normal",
+}: {
+  article: FeedArticle;
+  size?: "lead" | "normal";
+}) {
   const isLead = size === "lead";
-  // Try the publisher's direct URL first with no-referrer, which is enough
-  // to pass most hotlink checks (they typically block a *mismatched*
-  // referrer, not an absent one) and is faster since it skips a hop. Only
-  // fall back to the wsrv.nl proxy — some CDNs block known proxy services
-  // outright — and finally to the placeholder box.
-  const [stage, setStage] = useState<"direct" | "proxy" | "failed">("direct");
-  const src =
-    stage === "direct" ? article.imageDirect : stage === "proxy" ? article.image : null;
+  const slot = isLead ? IMAGE_SLOTS.lead : IMAGE_SLOTS.normal;
+
+  // Sized, right-slot proxy variant — built here (not stored server-side)
+  // so a lead card and a grid card showing the same article each request
+  // exactly the pixels they'll display, instead of sharing one arbitrary
+  // size. This is the fix for images being "not standardized, some real
+  // big": every card of a given kind now downloads the same dimensions.
+  const sizedProxy = article.imageDirect
+    ? wsrvUrl(article.imageDirect, slot.w, slot.h)
+    : article.image;
+
+  // Backfilled images (og:image scrapes, WP featured images, microlink)
+  // have unpredictable origin and size — some publishers use a single
+  // multi-MB banner as their fallback og:image for every article — so
+  // those always go through the sized proxy and skip the direct URL
+  // entirely. Feed-native images (media:content, enclosure) are normally
+  // already sized sanely by the publisher's own CDN, so trying them
+  // directly first is a safe, faster default, falling back to the proxy
+  // only if that fails.
+  const tryDirectFirst = article.imageOrigin === "feed";
+  const [stage, setStage] = useState<"direct" | "proxy" | "failed">(
+    tryDirectFirst ? "direct" : "proxy",
+  );
+  const src = stage === "direct" ? article.imageDirect : stage === "proxy" ? sizedProxy : null;
   const showImage = Boolean(src);
 
   const handleError = () => {
-    if (stage === "direct" && article.image) setStage("proxy");
+    if (stage === "direct" && sizedProxy) setStage("proxy");
     else setStage("failed");
   };
 
   return (
-    <a
-      href={article.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block"
-    >
+    <a href={article.link} target="_blank" rel="noopener noreferrer" className="group block">
       {showImage ? (
         <img
           src={src!}
           alt={article.title}
           loading={isLead ? "eager" : "lazy"}
           referrerPolicy="no-referrer"
-          className={`w-full rounded-sm object-cover ${isLead ? "aspect-[16/9]" : "aspect-[4/3]"}`}
+          className={`w-full rounded-sm object-cover ${isLead ? "aspect-[16/9] max-h-[420px]" : "aspect-[4/3] max-h-[280px]"}`}
           onError={handleError}
         />
       ) : (
         <div
-          className={`flex w-full items-center justify-center rounded-sm bg-muted ${isLead ? "aspect-[16/9]" : "aspect-[4/3]"}`}
+          className={`flex w-full items-center justify-center rounded-sm bg-muted ${isLead ? "aspect-[16/9] max-h-[420px]" : "aspect-[4/3] max-h-[280px]"}`}
         >
           <span className="text-xs text-muted-foreground">{article.sourceShort}</span>
         </div>
@@ -59,7 +77,9 @@ export function NewsCard({ article, size = "normal" }: { article: FeedArticle; s
         {article.title}
       </h3>
       {article.summary && (
-        <p className={`mt-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "line-clamp-3 text-sm"}`}>
+        <p
+          className={`mt-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "line-clamp-3 text-sm"}`}
+        >
           {article.summary}
         </p>
       )}

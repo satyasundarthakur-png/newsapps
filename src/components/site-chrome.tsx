@@ -41,7 +41,9 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
                 to="/"
                 search={{ source: s.id }}
                 className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                  activeSource === s.id ? "text-white" : "text-muted-foreground hover:text-foreground"
+                  activeSource === s.id
+                    ? "text-white"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
                 style={activeSource === s.id ? { backgroundColor: s.accent } : undefined}
               >

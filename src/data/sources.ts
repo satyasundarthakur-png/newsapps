@@ -201,5 +201,3 @@ export const SOURCES: NewsSource[] = [
     noImages: true,
   },
 ];
-
-export const CATEGORIES = ["ସବୁ", "ଓଡ଼ିଶା", "ଜାତୀୟ", "କ୍ରୀଡ଼ା", "ମନୋରଞ୍ଜନ", "ବ୍ୟବସାୟ"] as const;
