@@ -25,6 +25,15 @@ export interface NewsSource {
   // RSS URL, so we probe rather than hardcode a guess that can silently rot.
   candidates: string[];
   accent: string; // tailwind-safe hex used for the source pill
+  // Set for sites confirmed to run WordPress, so the image backfill can try
+  // the structured wp-json REST API (more reliable than scraping HTML,
+  // since it's less often behind anti-bot page challenges).
+  wordpress?: boolean;
+  // Google News RSS structurally never includes thumbnails, and its <link>
+  // is an opaque redirect token that only resolves in a real browser (JS),
+  // not a plain server fetch — so trying to backfill an image for it is a
+  // guaranteed-wasted request. Skip the attempt entirely for such sources.
+  noImages?: boolean;
 }
 
 export const GROUP_LABELS: Record<SourceGroup, string> = {
@@ -73,6 +82,7 @@ export const SOURCES: NewsSource[] = [
       "https://dharitri.com/feed/",
     ],
     accent: "#166534",
+    wordpress: true,
   },
   {
     id: "samaja",
@@ -86,6 +96,7 @@ export const SOURCES: NewsSource[] = [
       "https://samajalive.in/rss.xml",
     ],
     accent: "#7c3aed",
+    wordpress: true,
   },
   {
     id: "prameya",
@@ -112,6 +123,7 @@ export const SOURCES: NewsSource[] = [
       "https://kalingatv.com/rss.xml",
     ],
     accent: "#0891b2",
+    wordpress: true,
   },
   // National
   {
@@ -182,6 +194,11 @@ export const SOURCES: NewsSource[] = [
     group: "international",
     candidates: ["https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en"],
     accent: "#4285F4",
+    // Google's RSS structurally omits thumbnails, and its <link> is an
+    // opaque redirect token that only resolves to the real article inside
+    // a browser (client-side JS), not a plain server fetch — so any
+    // backfill attempt here is a guaranteed-wasted request every time.
+    noImages: true,
   },
 ];
 

@@ -4,16 +4,18 @@ import { timeAgoOdia } from "@/lib/time-ago";
 
 export function NewsCard({ article, size = "normal" }: { article: FeedArticle; size?: "lead" | "normal" }) {
   const isLead = size === "lead";
-  // Try the proxied (wsrv.nl) URL first — it sidesteps hotlink/referrer
-  // checks and mixed-content blocks. If that ever fails, fall back to the
-  // publisher's direct URL before giving up to the placeholder box.
-  const [stage, setStage] = useState<"proxy" | "direct" | "failed">("proxy");
+  // Try the publisher's direct URL first with no-referrer, which is enough
+  // to pass most hotlink checks (they typically block a *mismatched*
+  // referrer, not an absent one) and is faster since it skips a hop. Only
+  // fall back to the wsrv.nl proxy — some CDNs block known proxy services
+  // outright — and finally to the placeholder box.
+  const [stage, setStage] = useState<"direct" | "proxy" | "failed">("direct");
   const src =
-    stage === "proxy" ? article.image : stage === "direct" ? article.imageDirect : null;
+    stage === "direct" ? article.imageDirect : stage === "proxy" ? article.image : null;
   const showImage = Boolean(src);
 
   const handleError = () => {
-    if (stage === "proxy" && article.imageDirect) setStage("direct");
+    if (stage === "direct" && article.image) setStage("proxy");
     else setStage("failed");
   };
 

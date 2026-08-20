@@ -147,6 +147,112 @@ function parseDate(raw: unknown): string {
   return isNaN(d.getTime()) ? new Date(0).toISOString() : d.toISOString();
 }
 
+// Jugad #2: several Odia publishers (Sambad, Dharitri, Samaja, Kalinga TV —
+// several on custom CMSes, not just WordPress) can come back imageless from
+// their RSS feed — no media:content, no enclosure, no <img> in the
+// description. But the article page itself almost always sets an og:image
+// meta tag for WhatsApp/Facebook link previews, since that's how their own
+// shared links get a thumbnail. So for any article that came back imageless
+// from the feed, we do a lightweight fetch of the article page and scrape
+// that meta tag instead.
+async function fetchOgImage(articleUrl: string): Promise<string | null> {
+  try {
+    const res = await fetch(articleUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        Accept: "text/html",
+      },
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+    // og:image is almost always in <head>, which is early in the document —
+    // read a capped amount of text so this stays cheap even on heavy pages.
+    const reader = res.body?.getReader();
+    let html = "";
+    if (reader) {
+      const decoder = new TextDecoder();
+      while (html.length < 60_000) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        html += decoder.decode(value, { stream: true });
+      }
+      reader.cancel().catch(() => {});
+    } else {
+      html = await res.text();
+    }
+
+    const metaMatch =
+      /<meta[^>]+(?:property|name)=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["']/i.exec(
+        html,
+      ) ??
+      /<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']og:image(?::secure_url)?["']/i.exec(
+        html,
+      ) ??
+      /<meta[^>]+(?:property|name)=["']twitter:image["'][^>]+content=["']([^"']+)["']/i.exec(html);
+
+    if (!metaMatch) return null;
+    return absolutizeImageUrl(metaMatch[1]!.replace(/&amp;/g, "&"));
+  } catch {
+    return null;
+  }
+}
+
+// Jugad #3: for sites confirmed to run WordPress, the wp-json REST API is a
+// more reliable way to get a featured image than scraping the HTML page —
+// it's a plain JSON endpoint, so it's less likely to sit behind whatever
+// anti-bot challenge protects the actual article page, and it's a single
+// small request instead of parsing a full page. Looked up by slug, the last
+// path segment of the article URL, which is how default WP permalinks work.
+async function fetchWpFeaturedImage(articleUrl: string): Promise<string | null> {
+  try {
+    const url = new URL(articleUrl);
+    const slug = url.pathname.replace(/\/+$/, "").split("/").pop();
+    if (!slug) return null;
+    const apiUrl = `${url.origin}/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed`;
+    const res = await fetch(apiUrl, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as unknown;
+    const post = Array.isArray(data) ? (data[0] as Record<string, unknown> | undefined) : undefined;
+    const embedded = post?.["_embedded"] as Record<string, unknown> | undefined;
+    const media = embedded?.["wp:featuredmedia"] as Array<Record<string, unknown>> | undefined;
+    const sourceUrl = media?.[0]?.["source_url"] as string | undefined;
+    return sourceUrl ? absolutizeImageUrl(sourceUrl) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Runs the image backfill for imageless articles a few at a time, so a
+// slow/dead publisher page can't stall the whole request. Capped to the
+// most recent items only — backfilling all 15 would add too much latency
+// for items further down the list that matter less anyway. Sources flagged
+// noImages (Google News) are skipped entirely: their feed structurally has
+// no thumbnails and their links are JS-only redirects, so any attempt here
+// is a guaranteed-wasted request.
+async function backfillMissingImages(articles: FeedArticle[], source: NewsSource): Promise<void> {
+  if (source.noImages) return;
+  const needsImage = articles.filter((a) => !a.image).slice(0, 8);
+  const concurrency = 4;
+  for (let i = 0; i < needsImage.length; i += concurrency) {
+    const batch = needsImage.slice(i, i + concurrency);
+    await Promise.all(
+      batch.map(async (article) => {
+        const found = source.wordpress
+          ? (await fetchWpFeaturedImage(article.link)) ?? (await fetchOgImage(article.link))
+          : await fetchOgImage(article.link);
+        if (found) {
+          article.imageDirect = found;
+          article.image = proxyImage(found);
+        }
+      }),
+    );
+  }
+}
+
 async function tryFetchFeed(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
@@ -182,14 +288,14 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
 
       resolvedFeedUrl.set(source.id, url);
 
-      return items.slice(0, 15).map((item, idx): FeedArticle => {
+      const articles = items.slice(0, 15).map((item, idx): FeedArticle => {
         const link =
           typeof item["link"] === "string"
             ? (item["link"] as string)
             : ((item["link"] as Record<string, unknown>)?.["@_href"] as string) ||
               String(item["link"] ?? source.homepage);
         const title = stripHtml(String(item["title"] ?? ""));
-        const rawImage = findImage(item);
+        const rawImage = source.noImages ? null : findImage(item);
         return {
           id: `${source.id}-${idx}-${link}`,
           title,
@@ -211,6 +317,15 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
           accent: source.accent,
         };
       });
+
+      // Only worth doing this for sources whose feed genuinely omits images
+      // — if the feed already gives every item a photo, skip the extra
+      // network round-trips entirely.
+      if (articles.some((a) => !a.image)) {
+        await backfillMissingImages(articles, source);
+      }
+
+      return articles;
     } catch {
       continue;
     }
