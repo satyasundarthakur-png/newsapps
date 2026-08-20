@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { SOURCES, GROUP_LABELS, type SourceGroup } from "@/data/sources";
-import { GlobeDoodle } from "@/components/globe-doodle";
 
 const GROUP_ORDER: SourceGroup[] = ["odia", "national", "international"];
 
@@ -27,7 +26,11 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
             <span className="max-w-[14rem] text-right text-xs leading-odia tracking-wide text-muted-foreground">
               ଓଡ଼ିଶା, ଜାତୀୟ ଓ ଆନ୍ତର୍ଜାତୀୟ ଖବର ଏକାଠି
             </span>
-            <GlobeDoodle className="h-14 w-14 shrink-0 text-muted-foreground/70" />
+            <div
+              className="earth-doodle"
+              style={{ ["--earth-size" as string]: "3.5rem" }}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </div>
@@ -39,19 +42,22 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
           phone's viewport. */}
       <div className="sticky top-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-3">
-          <div className="scrollbar-thin flex items-center gap-1.5 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
+          {/* Top-level "All" tab uses the lighter underline-tab treatment —
+              text-forward, uppercase, active state marked by an underline
+              rather than a filled pill. The individual publisher pills
+              below stay filled/rounded on purpose: with names ranging from
+              "OTV" to "Hindustan Times" to "କଳିଙ୍ଗ ଟିଭି", uppercase
+              underlined text at that density reads worse than a colored
+              pill, especially at Odia-script sizes. */}
+          <nav className="news-section">
             <Link
               to="/"
               search={{ source: "all" }}
-              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                !activeSource || activeSource === "all"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={!activeSource || activeSource === "all" ? "active" : undefined}
             >
               ସବୁ
             </Link>
-          </div>
+          </nav>
 
           {GROUP_ORDER.map((group) => (
             <div
