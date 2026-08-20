@@ -33,7 +33,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { articles, failedSources } = Route.useLoaderData();
+  const { articles, failedSources, comingSoon } = Route.useLoaderData();
   const { source } = Route.useSearch();
 
   const [lead, ...rest] = articles;
@@ -46,43 +46,63 @@ function Home() {
       <main className="mx-auto max-w-6xl px-5 py-10">
         <h1 className="sr-only">ମେରିଡିଆନ୍ ଖବର — ଆଜିର ମୁଖ୍ୟ ଶିରୋନାମା</h1>
 
-        {failedSources.length > 0 && (
-          <p className="mb-6 rounded-md bg-muted px-4 py-2 text-xs text-muted-foreground">
-            {failedSources.join(", ")} ର ଖବର ବର୍ତ୍ତମାନ ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଅନ୍ୟ ଉତ୍ସର ଖବର
-            ଦେଖାଯାଉଛି।
-          </p>
-        )}
+        {comingSoon ? (
+          <div className="flex flex-col items-center gap-3 py-24 text-center">
+            <span
+              className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white"
+              style={{ backgroundColor: "#2BA84A" }}
+            >
+              ଶୀଘ୍ର ଆସୁଛି
+            </span>
+            <p className="max-w-md text-lg font-medium text-foreground">
+              DailyHunt ର ଲାଇଭ୍ ଖବର ଏଠାରେ ଶୀଘ୍ର ଯୋଡ଼ାଯିବ।
+            </p>
+            <p className="max-w-md text-sm text-muted-foreground">
+              DailyHuntର ଆଧିକାରିକ Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍ ମାଧ୍ୟମରେ ଉପଲବ୍ଧ — ଅନୁମୋଦନ
+              ପରେ ଏହି ଉତ୍ସର ଖବର ଏଠାରେ ଦେଖାଯିବ।
+            </p>
+          </div>
+        ) : (
+          <>
+            {failedSources.length > 0 && (
+              <p className="mb-6 rounded-md bg-muted px-4 py-2 text-xs text-muted-foreground">
+                {failedSources.join(", ")} ର ଖବର ବର୍ତ୍ତମାନ ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଅନ୍ୟ ଉତ୍ସର ଖବର
+                ଦେଖାଯାଉଛି।
+              </p>
+            )}
 
-        {articles.length === 0 && (
-          <p className="py-20 text-center text-muted-foreground">
-            ବର୍ତ୍ତମାନ କୌଣସି ଖବର ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଦୟାକରି ପରେ ଚେଷ୍ଟା କରନ୍ତୁ।
-          </p>
-        )}
+            {articles.length === 0 && (
+              <p className="py-20 text-center text-muted-foreground">
+                ବର୍ତ୍ତମାନ କୌଣସି ଖବର ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଦୟାକରି ପରେ ଚେଷ୍ଟା କରନ୍ତୁ।
+              </p>
+            )}
 
-        {lead && (
-          <section className="grid gap-8 border-b border-border pb-10 lg:grid-cols-[1.4fr_1fr]">
-            <NewsCard article={lead} size="lead" />
-            <div className="flex flex-col divide-y divide-border border-t border-border lg:border-t-0 lg:border-l lg:pl-8">
-              {secondary.map((a) => (
-                <div key={a.id} className="py-5 first:pt-0 lg:first:pt-0">
-                  <NewsCard article={a} />
+            {lead && (
+              <section className="grid gap-8 border-b border-border pb-10 lg:grid-cols-[1.4fr_1fr]">
+                <NewsCard article={lead} size="lead" />
+                <div className="flex flex-col divide-y divide-border border-t border-border lg:border-t-0 lg:border-l lg:pl-8">
+                  {secondary.map((a) => (
+                    <div key={a.id} className="py-5 first:pt-0 lg:first:pt-0">
+                      <NewsCard article={a} />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {remaining.length > 0 && (
-          <section className="pt-10">
-            <h2 className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-              ଅନ୍ୟ ଖବର
-            </h2>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {remaining.map((a) => (
-                <NewsCard key={a.id} article={a} />
-              ))}
-            </div>
-          </section>
+            {remaining.length > 0 && (
+              <section className="pt-10">
+                <h2 className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
+                  ଅନ୍ୟ ଖବର
+                </h2>
+                <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                  {remaining.map((a) => (
+                    <NewsCard key={a.id} article={a} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
         )}
       </main>
       <SiteFooter />

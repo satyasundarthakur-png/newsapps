@@ -51,7 +51,7 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
                 key={s.id}
                 to="/"
                 search={{ source: s.id }}
-                className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
                   activeSource === s.id
                     ? "text-white"
                     : "text-muted-foreground hover:text-foreground"
@@ -59,6 +59,17 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
                 style={activeSource === s.id ? { backgroundColor: s.accent } : undefined}
               >
                 {s.name}
+                {s.comingSoon && (
+                  <span
+                    className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
+                    style={{
+                      backgroundColor: activeSource === s.id ? "rgba(255,255,255,0.25)" : s.accent,
+                      color: activeSource === s.id ? "white" : "white",
+                    }}
+                  >
+                    ଶୀଘ୍ର
+                  </span>
+                )}
               </Link>
             ))}
           </div>

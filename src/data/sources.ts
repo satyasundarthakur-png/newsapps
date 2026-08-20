@@ -10,7 +10,8 @@ export type SourceId =
   | "indianexpress"
   | "bbc"
   | "aljazeera"
-  | "msn";
+  | "msn"
+  | "dailyhunt";
 
 export type SourceGroup = "odia" | "national" | "international";
 
@@ -29,6 +30,11 @@ export interface NewsSource {
   // the structured wp-json REST API (more reliable than scraping HTML,
   // since it's less often behind anti-bot page challenges).
   wordpress?: boolean;
+  // Set for sources with no live feed wired up yet. The tab renders with a
+  // "soon" badge, is excluded from fetchAllNews entirely (no wasted
+  // request, no false "unavailable" flag), and clicking it shows a plain
+  // placeholder message instead of the generic empty/error state.
+  comingSoon?: boolean;
 }
 
 export const GROUP_LABELS: Record<SourceGroup, string> = {
@@ -198,5 +204,20 @@ export const SOURCES: NewsSource[] = [
       "https://www.bing.com/news/search?q=top+news&format=rss",
     ],
     accent: "#008373",
+  },
+  {
+    id: "dailyhunt",
+    name: "DailyHunt",
+    shortName: "DailyHunt",
+    homepage: "https://dailyhunt.in",
+    group: "international",
+    // DailyHunt's Content Syndication API is partner-only (API key, secret
+    // key, and partner code issued after onboarding — no public/self-serve
+    // feed), so there's nothing to fetch yet. Left as an empty candidate
+    // list on purpose; fetchAllNews skips comingSoon sources entirely
+    // rather than probing URLs that don't exist.
+    candidates: [],
+    accent: "#2BA84A",
+    comingSoon: true,
   },
 ];

@@ -306,6 +306,8 @@ async function tryFetchFeed(url: string): Promise<string | null> {
 }
 
 async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
+  if (source.comingSoon) return [];
+
   const cached = resolvedFeedUrl.get(source.id);
   const candidates = cached ? [cached, ...source.candidates] : source.candidates;
 
@@ -373,10 +375,11 @@ export async function fetchAllNews(): Promise<{
   articles: FeedArticle[];
   failedSources: string[];
 }> {
-  const results = await Promise.all(SOURCES.map((s) => fetchSourceArticles(s)));
-  const failedSources = SOURCES.filter((_, i) => (results[i]?.length ?? 0) === 0).map(
-    (s) => s.shortName,
-  );
+  const fetchable = SOURCES.filter((s) => !s.comingSoon);
+  const results = await Promise.all(fetchable.map((s) => fetchSourceArticles(s)));
+  const failedSources = fetchable
+    .filter((_, i) => (results[i]?.length ?? 0) === 0)
+    .map((s) => s.shortName);
   const articles = results
     .flat()
     .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
