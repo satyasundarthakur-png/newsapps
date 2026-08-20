@@ -77,10 +77,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ମେରିଡିଆନ୍ ଖବର" },
-      { name: "description", content: "ସ୍ୱାଧୀନ ଓଡ଼ିଆ ଦୈନିକ ଖବର।" },
+      { title: "ମେରିଡିଆନ୍ ଖବର — ଏକ ସ୍ଥାନରେ ସବୁ ଓଡ଼ିଆ, ଜାତୀୟ ଓ ଆନ୍ତର୍ଜାତୀୟ ଖବର" },
+      {
+        name: "description",
+        content:
+          "OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ, କଳିଙ୍ଗ ଟିଭି, BBC, Al Jazeera ଓ MSNଙ୍କ ଲାଇଭ୍ ଖବର ଏକାଠି।",
+      },
+      { name: "theme-color", content: "#6B1224" },
       { property: "og:type", content: "website" },
+      { property: "og:title", content: "ମେରିଡିଆନ୍ ଖବର" },
+      {
+        property: "og:description",
+        content:
+          "ଓଡ଼ିଶା, ଜାତୀୟ ଓ ଆନ୍ତର୍ଜାତୀୟ ଖବର ଏକାଠି — OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ ଓ ଆହୁରି ଅନେକ।",
+      },
+      { property: "og:image", content: "/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "ମେରିଡିଆନ୍ ଖବର" },
+      { name: "twitter:image", content: "/og-image.png" },
     ],
     links: [
       {
@@ -94,6 +110,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Noto+Serif+Oriya:wght@500;600;700&family=Noto+Sans+Oriya:wght@400;500;600&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "icon", href: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { rel: "icon", href: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
   }),
   shellComponent: RootShell,
@@ -121,6 +141,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Decorative dot-map of the world with Odisha marked, fixed behind
+          everything at low opacity — purely visual, not interactive. */}
+      <div className="map-backdrop" aria-hidden="true" />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

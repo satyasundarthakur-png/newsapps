@@ -5,10 +5,21 @@ const GROUP_ORDER: SourceGroup[] = ["odia", "national", "international"];
 
 export function SiteHeader({ activeSource }: { activeSource?: string }) {
   return (
-    <header className="border-b border-border bg-background">
+    <header className="relative overflow-hidden border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      {/* Thin rainbow accent stripe echoing the site's chart palette */}
+      <div
+        className="h-1 w-full"
+        style={{
+          background:
+            "linear-gradient(90deg, #9F1D35 0%, #D9432A 20%, #E8A93B 40%, #2E8B57 60%, #0E7C86 80%, #7C3AED 100%)",
+        }}
+      />
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-5">
         <div className="flex items-baseline justify-between gap-4">
-          <Link to="/" className="font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+          <Link
+            to="/"
+            className="text-rainbow font-serif text-3xl font-extrabold tracking-tight sm:text-4xl"
+          >
             ମେରିଡିଆନ୍ ଖବର
           </Link>
           <span className="hidden text-xs tracking-wide text-muted-foreground sm:block">
@@ -22,7 +33,7 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
             search={{ source: "all" }}
             className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
               !activeSource || activeSource === "all"
-                ? "bg-foreground text-background"
+                ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -59,7 +70,14 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-border">
+    <footer className="relative mt-16 overflow-hidden border-t border-border">
+      <div
+        className="h-1 w-full"
+        style={{
+          background:
+            "linear-gradient(90deg, #0E7C86 0%, #2E8B57 20%, #E8A93B 40%, #D9432A 60%, #9F1D35 80%, #7C3AED 100%)",
+        }}
+      />
       <div className="mx-auto max-w-6xl px-5 py-8 text-xs text-muted-foreground">
         © {new Date().getFullYear()} ମେରିଡିଆନ୍ ଖବର। ପ୍ରତ୍ୟେକ ଖବରର ସାରାଂଶ ମାତ୍ର ଏଠାରେ ଦେଖାଯାଏ — ଏହା
         OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ, କଳିଙ୍ଗ ଟିଭି, Times of India, Hindustan Times, Indian

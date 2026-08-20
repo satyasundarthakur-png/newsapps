@@ -41,7 +41,7 @@ function Home() {
   const remaining = rest.slice(2);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen">
       <SiteHeader activeSource={source} />
       <main className="mx-auto max-w-6xl px-5 py-10">
         <h1 className="sr-only">ମେରିଡିଆନ୍ ଖବର — ଆଜିର ମୁଖ୍ୟ ଶିରୋନାମା</h1>
