@@ -167,21 +167,19 @@
 }
 
 /* CSS-only spinning Earth doodle — a lighter alternative to the SVG
-   GlobeDoodle wireframe, recolored from the originally-pasted DodgerBlue/
-   ForestGreen to the site's own teal (ocean) and gold (land) so it sits
-   with the Jagannath-maroon/temple-gold palette instead of clashing
-   against it. Sized via the --earth-size custom property so it can be
-   dropped in at any scale without a separate CSS rule per size. */
+   GlobeDoodle wireframe this replaced. Uses a self-generated world-map
+   texture (public/earth-map.svg, no external assets/licensing) instead of
+   a flat gradient, cropped to a circle. Sized via the --earth-size custom
+   property so it can be dropped in at any scale without a separate CSS
+   rule per size. Glow color kept as the teal ocean tone from the map
+   itself rather than the originally-pasted light-blue sky tone, so the
+   glow reads as "the ocean" rather than an unrelated color. */
 .earth-doodle {
-  width: var(--earth-size, 150px);
-  height: var(--earth-size, 150px);
+  width: var(--earth-size, 180px);
+  height: var(--earth-size, 180px);
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 35%,
-    oklch(0.536 0.089 205.032) 55%,
-    oklch(0.776 0.142 77.255) 45%
-  );
-  box-shadow: 0 0 20px color-mix(in oklch, oklch(0.536 0.089 205.032) 45%, transparent);
+  background: url("/earth-map.svg") no-repeat center / cover;
+  box-shadow: 0 0 25px color-mix(in oklch, oklch(0.536 0.089 205.032) 50%, transparent);
   animation: earth-spin 60s linear infinite;
   flex-shrink: 0;
 }
