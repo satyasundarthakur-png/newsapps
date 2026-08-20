@@ -118,7 +118,7 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
 
 export function SiteFooter() {
   return (
-    <footer className="relative mt-16 overflow-hidden border-t border-border">
+    <footer className="relative mt-16 overflow-visible border-t border-border">
       <div
         className="h-1 w-full"
         style={{
@@ -126,10 +126,43 @@ export function SiteFooter() {
             "linear-gradient(90deg, #0E7C86 0%, #2E8B57 20%, #E8A93B 40%, #D9432A 60%, #9F1D35 80%, #7C3AED 100%)",
         }}
       />
-      <div className="mx-auto max-w-6xl px-5 py-8 text-xs text-muted-foreground">
-        © {new Date().getFullYear()} ମେରିଡିଆନ୍ ଖବର। ପ୍ରତ୍ୟେକ ଖବରର ସାରାଂଶ ମାତ୍ର ଏଠାରେ ଦେଖାଯାଏ — ଏହା
-        OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ, କଳିଙ୍ଗ ଟିଭି, Times of India, Hindustan Times, Indian
-        Express, BBC, Al Jazeera ଓ MSN/Bing News ଠାରୁ ସଂଗୃହିତ। ପୂର୍ଣ୍ଣ ଖବର ପାଇଁ ମୂଳ ଉତ୍ସକୁ ଯାଆନ୍ତୁ।
+      <div className="mx-auto max-w-6xl px-5 py-8">
+        {/* Palette: every source's own accent color as a clickable dot —
+            a quick "jump straight to this publisher by color" shortcut
+            that also doubles as a colorful little legend of everything
+            the site pulls from. comingSoon sources (DailyHunt) still show
+            their dot so the palette stays visually complete, but dimmed
+            and non-clickable rather than linking to an empty page. */}
+        <nav aria-label="ଉତ୍ସ ପାଇଁ ରଙ୍ଗ ପାଠା" className="mb-6 flex flex-wrap items-center">
+          {SOURCES.map((s) =>
+            s.comingSoon ? (
+              <span
+                key={s.id}
+                className="palette is-coming-soon"
+                style={{ backgroundColor: s.accent }}
+                title={`${s.name} — ଶୀଘ୍ର ଆସୁଛି`}
+                aria-hidden="true"
+              />
+            ) : (
+              <Link
+                key={s.id}
+                to="/"
+                search={{ source: s.id }}
+                className="palette"
+                style={{ backgroundColor: s.accent }}
+                title={s.name}
+                aria-label={s.name}
+              />
+            ),
+          )}
+        </nav>
+
+        <div className="text-xs text-muted-foreground">
+          © {new Date().getFullYear()} ମେରିଡିଆନ୍ ଖବର। ପ୍ରତ୍ୟେକ ଖବରର ସାରାଂଶ ମାତ୍ର ଏଠାରେ ଦେଖାଯାଏ — ଏହା
+          OTV, ସମ୍ବାଦ, ଧରିତ୍ରୀ, ସମାଜ, ପ୍ରମେୟ, କଳିଙ୍ଗ ଟିଭି, Times of India, Hindustan Times, Indian
+          Express, BBC, Al Jazeera ଓ MSN/Bing News ଠାରୁ ସଂଗୃହିତ। ପୂର୍ଣ୍ଣ ଖବର ପାଇଁ ମୂଳ ଉତ୍ସକୁ
+          ଯାଆନ୍ତୁ।
+        </div>
       </div>
     </footer>
   );

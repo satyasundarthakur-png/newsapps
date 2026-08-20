@@ -235,7 +235,40 @@
   }
 }
 
-/* Thin scrollbar for the mobile horizontally-scrolling source-pill rows —
+/* Palette dots: each source's own accent color as a clickable circle —
+   doubles as a fun visual legend and a quick "jump straight to this
+   publisher by color" shortcut, in the footer. Sizing/transition/cursor
+   kept as given; the hover glow color is adapted from the originally-
+   pasted DodgerBlue rgba to the theme's own accent (teal) via
+   color-mix, since each dot's own background already varies by source —
+   the hover ring should read as "the site's highlight," not a color
+   unrelated to the rest of the palette. */
+.palette {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: inline-block;
+}
+.palette:hover,
+.palette:focus-visible {
+  box-shadow:
+    0 0 15px color-mix(in oklch, var(--color-accent) 80%, transparent),
+    0 0 25px color-mix(in oklch, var(--color-accent) 60%, transparent);
+  transform: scale(1.1);
+}
+.palette.is-coming-soon {
+  opacity: 0.35;
+  cursor: default;
+}
+.palette.is-coming-soon:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+
    Tailwind v4 core has no scrollbar-width utility, so defined directly. */
 .scrollbar-thin {
   scrollbar-width: thin;
