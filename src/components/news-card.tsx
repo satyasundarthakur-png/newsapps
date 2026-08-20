@@ -80,11 +80,13 @@ export function NewsCard({
         {article.title}
       </h3>
       {article.summary && (
-        <p
-          className={`mt-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "line-clamp-3 text-sm"}`}
-        >
-          {article.summary}
-        </p>
+        <div className={`mt-2 space-y-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "text-sm"}`}>
+          {article.summary.split("\n\n").map((para, i) => (
+            <p key={i} className={!isLead ? "line-clamp-4" : undefined}>
+              {para}
+            </p>
+          ))}
+        </div>
       )}
       <span className="mt-2 inline-block text-[11px] font-medium text-muted-foreground/70 underline-offset-2 group-hover:underline">
         ମୂଳ ଖବର ପଢ଼ନ୍ତୁ →

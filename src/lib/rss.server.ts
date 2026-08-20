@@ -54,6 +54,74 @@ function stripHtml(html: string | undefined): string {
 // Picks the longest usable plain-text excerpt across the fields a feed might
 // populate, then trims to a whole-word boundary near maxLen so cards get a
 // real summary instead of just a headline + photo.
+//
+// summarizeFeedItem() supersedes the old flat-truncate version: it prefers
+// content:encoded (the full article body many feeds embed) over the short
+// <description> teaser when both exist, and truncates at sentence/paragraph
+// boundaries instead of an arbitrary character cut, so a card reads as 2-3
+// complete sentences (teaser-only feeds) or 2-3 short paragraphs
+// (full-content feeds) rather than a clause chopped mid-word.
+const SENTENCE_SPLIT = /(?<=[.!?।])\s+/; // includes Odia's danda (।) as a sentence end
+
+function splitParagraphs(text: string): string[] {
+  return text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+function firstNSentences(text: string, n: number): string {
+  const sentences = text.split(SENTENCE_SPLIT).filter(Boolean);
+  return sentences.slice(0, n).join(" ").trim();
+}
+
+function truncateGraceful(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text;
+  const cut = text.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${cut.slice(0, lastSpace > 0 ? lastSpace : maxLen)}…`;
+}
+
+// Per-server-instance cache: a feed item's summary only needs computing
+// once (the sentence-splitting/truncation work is pure given the same raw
+// fields), then every subsequent request for the same article id reuses
+// the cached result instead of redoing it.
+const summaryCache = new Map<string, string>();
+
+export function summarizeFeedItem(
+  itemId: string,
+  fields: { description?: string | undefined; contentEncoded?: string | undefined; summary?: string | undefined },
+  title: string,
+  maxLen = 500,
+): string {
+  const cached = summaryCache.get(itemId);
+  if (cached !== undefined) return cached;
+
+  const teaser = stripHtml(fields.description);
+  const full = stripHtml(fields.contentEncoded);
+  const alt = stripHtml(fields.summary);
+
+  let result: string;
+
+  // Full article body available (content:encoded) and it's genuinely
+  // richer than the teaser — use it, rendered as 2-3 short paragraphs.
+  if (full && full.length > teaser.length + 40) {
+    const rawParagraphs = splitParagraphs(fields.contentEncoded ?? "").map(stripHtml);
+    const paragraphs = (rawParagraphs.length > 1 ? rawParagraphs : [full])
+      .filter((p) => p.length > 0 && p.toLowerCase() !== title.toLowerCase())
+      .slice(0, 3);
+    result = paragraphs.length > 0 ? paragraphs.join("\n\n") : firstNSentences(full, 3);
+  } else {
+    // Teaser-only feed — 2-3 sentences instead of the raw blob.
+    const base = [teaser, alt].find((t) => t.length > 0 && t.toLowerCase() !== title.toLowerCase());
+    result = base ? firstNSentences(base, 3) : "";
+  }
+
+  result = truncateGraceful(result, maxLen);
+  summaryCache.set(itemId, result);
+  return result;
+}
+
 function bestSummary(fields: Array<string | undefined>, title: string, maxLen = 260): string {
   const candidates = fields
     .map((f) => stripHtml(f))
@@ -396,15 +464,18 @@ async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
               String(item["link"] ?? source.homepage);
         const title = stripHtml(String(item["title"] ?? ""));
         const rawImage = findImage(item);
+        const link2 = link;
+        const itemId = `${source.id}-${idx}-${link2}`;
         return {
-          id: `${source.id}-${idx}-${link}`,
+          id: itemId,
           title,
-          summary: bestSummary(
-            [
-              item["description"] as string | undefined,
-              item["content:encoded"] as string | undefined,
-              item["summary"] as string | undefined,
-            ],
+          summary: summarizeFeedItem(
+            itemId,
+            {
+              description: item["description"] as string | undefined,
+              contentEncoded: item["content:encoded"] as string | undefined,
+              summary: item["summary"] as string | undefined,
+            },
             title,
           ),
           link,
