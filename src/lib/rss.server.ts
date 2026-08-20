@@ -305,8 +305,72 @@ async function tryFetchFeed(url: string): Promise<string | null> {
   }
 }
 
+async function tryFetchJson(url: string): Promise<unknown | null> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; OdiaNewsApp/1.0; +https://lovable.app)",
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// Parses the community jugad shape: { data: [{ title, content, imageUrl,
+// publisherStory, url, PublishedTime, ... }] }. Field names/casing come
+// from the unofficial project itself, not from us, and aren't guaranteed
+// stable — this is defensive on purpose (every field optional-chained).
+function parseJugadJson(json: unknown, source: NewsSource): FeedArticle[] {
+  const rows = (json as { data?: unknown[] })?.data;
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+
+  return rows.slice(0, 15).map((row, idx): FeedArticle => {
+    const r = row as Record<string, unknown>;
+    const title = stripHtml(String(r["title"] ?? ""));
+    const link = String(r["publisherStory"] ?? r["url"] ?? source.homepage);
+    const rawImage =
+      typeof r["imageUrl"] === "string" ? absolutizeImageUrl(r["imageUrl"]) : null;
+    return {
+      id: `${source.id}-${idx}-${link}`,
+      title,
+      summary: bestSummary([r["content"] as string | undefined], title),
+      link,
+      image: rawImage ? proxyImage(rawImage) : null,
+      imageDirect: rawImage,
+      imageOrigin: rawImage ? "feed" : null,
+      pubDate: parseDate(r["PublishedTime"] as string | undefined),
+      sourceId: source.id,
+      sourceName: source.name,
+      sourceShort: source.shortName,
+      accent: source.accent,
+    };
+  });
+}
+
 async function fetchSourceArticles(source: NewsSource): Promise<FeedArticle[]> {
   if (source.comingSoon) return [];
+
+  if (source.jugadJson) {
+    const cached = resolvedFeedUrl.get(source.id);
+    const candidates = cached ? [cached, ...source.candidates] : source.candidates;
+    for (const url of candidates) {
+      const json = await tryFetchJson(url);
+      if (!json) continue;
+      const articles = parseJugadJson(json, source);
+      if (articles.length === 0) continue;
+      resolvedFeedUrl.set(source.id, url);
+      if (articles.some((a) => !a.image)) {
+        await backfillMissingImages(articles, source);
+      }
+      return articles;
+    }
+    return [];
+  }
 
   const cached = resolvedFeedUrl.get(source.id);
   const candidates = cached ? [cached, ...source.candidates] : source.candidates;

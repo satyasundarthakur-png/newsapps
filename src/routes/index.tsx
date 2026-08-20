@@ -71,7 +71,27 @@ function Home() {
               </p>
             )}
 
-            {articles.length === 0 && (
+            {articles.length === 0 && source === "dailyhunt" && (
+              <div className="flex flex-col items-center gap-3 py-24 text-center">
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white"
+                  style={{ backgroundColor: "#2BA84A" }}
+                >
+                  ଅନଧିକୃତ ଉତ୍ସ ବର୍ତ୍ତମାନ ଉପଲବ୍ଧ ନାହିଁ
+                </span>
+                <p className="max-w-md text-lg font-medium text-foreground">
+                  DailyHuntର ଅଫିସିଆଲ୍ ଫିଡ୍ ପାର୍ଟନର୍-ଓନଲି, ତେଣୁ ଏଠାରେ ଏକ ଅନଧିକୃତ (community jugad)
+                  JSON ଉତ୍ସରୁ ଚେଷ୍ଟା କରାଯାଉଛି — ଆଜି ଏହା ଉତ୍ତର ଦେଉନାହିଁ।
+                </p>
+                <p className="max-w-md text-sm text-muted-foreground">
+                  ଏହା ଏକ ଅନାଧିକୃତ, ରକ୍ଷଣାବେକ୍ଷଣ-ବିହୀନ ପ୍ରକଳ୍ପ ଉପରେ ନିର୍ଭରଶୀଳ ବୋଲି ଯେକୌଣସି ସମୟରେ ଏହା
+                  ବନ୍ଦ ହୋଇପାରେ। ସ୍ଥାୟୀ ସମାଧାନ ପାଇଁ DailyHuntର Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍
+                  ପାଇଁ ଆବେଦନ କରାଯାଇପାରେ।
+                </p>
+              </div>
+            )}
+
+            {articles.length === 0 && source !== "dailyhunt" && (
               <p className="py-20 text-center text-muted-foreground">
                 ବର୍ତ୍ତମାନ କୌଣସି ଖବର ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଦୟାକରି ପରେ ଚେଷ୍ଟା କରନ୍ତୁ।
               </p>

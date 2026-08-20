@@ -59,15 +59,16 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
                 style={activeSource === s.id ? { backgroundColor: s.accent } : undefined}
               >
                 {s.name}
-                {s.comingSoon && (
+                {s.jugadJson && (
                   <span
+                    title="ଅନଧିକୃତ (unofficial) API — ଯେକୌଣସି ସମୟରେ ବନ୍ଦ ହୋଇପାରେ"
                     className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
                     style={{
                       backgroundColor: activeSource === s.id ? "rgba(255,255,255,0.25)" : s.accent,
-                      color: activeSource === s.id ? "white" : "white",
+                      color: "white",
                     }}
                   >
-                    ଶୀଘ୍ର
+                    ଅନଧିକୃତ
                   </span>
                 )}
               </Link>

@@ -35,6 +35,14 @@ export interface NewsSource {
   // request, no false "unavailable" flag), and clicking it shows a plain
   // placeholder message instead of the generic empty/error state.
   comingSoon?: boolean;
+  // Set when there's no official RSS/API, so we fall back to an unofficial,
+  // community-reverse-engineered JSON endpoint that mirrors DailyHunt's
+  // internal category API (see candidates for the actual URLs). These are
+  // unmaintained side projects hitting an undocumented endpoint, not a
+  // sanctioned integration — they can go dark at any time with zero notice,
+  // unlike a publisher's own RSS feed. When set, fetchSourceArticles parses
+  // `candidates` as JSON (jugad shape) instead of XML.
+  jugadJson?: boolean;
 }
 
 export const GROUP_LABELS: Record<SourceGroup, string> = {
@@ -211,13 +219,23 @@ export const SOURCES: NewsSource[] = [
     shortName: "DailyHunt",
     homepage: "https://dailyhunt.in",
     group: "international",
-    // DailyHunt's Content Syndication API is partner-only (API key, secret
-    // key, and partner code issued after onboarding — no public/self-serve
-    // feed), so there's nothing to fetch yet. Left as an empty candidate
-    // list on purpose; fetchAllNews skips comingSoon sources entirely
-    // rather than probing URLs that don't exist.
-    candidates: [],
+    // DailyHunt's official Content Syndication API is partner-only (API
+    // key + secret + partner code issued after a business onboarding —
+    // see api-syndication.dailyhunt.in — no public/self-serve feed).
+    // Jugad fallback: a couple of small open-source projects
+    // (Gowtham2003/DailyHunt-NewsAPI, vendz/dailyhunt-api) reverse-engineered
+    // DailyHunt's own internal category feed and re-expose it as plain JSON.
+    // We probe those the same way we probe RSS candidates above — first one
+    // that responds with a valid `data[]` array wins. This is NOT an
+    // official integration: it can break or disappear without warning,
+    // since it depends on an undocumented endpoint and a side project
+    // staying online. If every candidate fails, the UI falls back to a
+    // placeholder explaining that, rather than a generic error.
+    candidates: [
+      "https://dailyhunt.vercel.app/news?category=india",
+      "https://dailyhunt.vercel.app/news?category=world",
+    ],
     accent: "#2BA84A",
-    comingSoon: true,
+    jugadJson: true,
   },
 ];
