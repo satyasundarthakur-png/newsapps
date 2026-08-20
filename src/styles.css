@@ -166,6 +166,22 @@
   opacity: 0.1;
 }
 
+/* Header doodle globe: slow wireframe spin + gentle pulse on the India pin */
+.globe-spin {
+  animation: globe-spin 18s linear infinite;
+}
+@keyframes globe-spin {
+  from { transform: rotate(0deg) scaleX(1); }
+  to { transform: rotate(360deg) scaleX(1); }
+}
+.globe-pulse {
+  animation: globe-pulse 2.4s ease-in-out infinite;
+}
+@keyframes globe-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.25; }
+  50% { transform: scale(1.6); opacity: 0.05; }
+}
+
 /* Rainbow gradient text for the masthead — cycles through the palette's
    maroon -> gold -> teal -> forest-green -> saffron, matching --chart-*. */
 .text-rainbow {

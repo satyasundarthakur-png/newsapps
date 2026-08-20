@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { SOURCES, GROUP_LABELS, type SourceGroup } from "@/data/sources";
+import { GlobeDoodle } from "@/components/globe-doodle";
 
 const GROUP_ORDER: SourceGroup[] = ["odia", "national", "international"];
 
@@ -15,16 +16,19 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
         }}
       />
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-5">
-        <div className="flex items-baseline justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <Link
             to="/"
             className="text-rainbow font-serif text-3xl font-extrabold tracking-tight sm:text-4xl"
           >
             ମେରିଡିଆନ୍ ଖବର
           </Link>
-          <span className="hidden text-xs tracking-wide text-muted-foreground sm:block">
-            ଓଡ଼ିଶା, ଜାତୀୟ ଓ ଆନ୍ତର୍ଜାତୀୟ ଖବର ଏକାଠି
-          </span>
+          <div className="hidden items-center gap-3 sm:flex">
+            <span className="max-w-[14rem] text-right text-xs leading-snug tracking-wide text-muted-foreground">
+              ଓଡ଼ିଶା, ଜାତୀୟ ଓ ଆନ୍ତର୍ଜାତୀୟ ଖବର ଏକାଠି
+            </span>
+            <GlobeDoodle className="h-14 w-14 shrink-0 text-muted-foreground/70" />
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
