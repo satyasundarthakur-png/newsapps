@@ -42,7 +42,7 @@ export function NewsCard({
       href={article.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-md border p-3 transition-colors"
+      className="group block rounded-md border p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
       style={{ backgroundColor: cardBg, borderColor: cardBorder }}
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = cardBgHover)}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = cardBg)}
@@ -53,7 +53,7 @@ export function NewsCard({
           alt={article.title}
           loading={isLead ? "eager" : "lazy"}
           referrerPolicy="no-referrer"
-          className={`w-full rounded-sm object-cover ${isLead ? "aspect-[16/9] max-h-[420px]" : "aspect-[4/3] max-h-[280px]"}`}
+          className={`w-full rounded-sm object-cover transition-transform duration-300 group-hover:scale-[1.02] ${isLead ? "aspect-[16/9] max-h-[420px]" : "aspect-[4/3] max-h-[280px]"}`}
           onError={handleError}
         />
       ) : (
@@ -75,14 +75,16 @@ export function NewsCard({
         )}
       </div>
       <h3
-        className={`mt-1.5 font-serif leading-snug font-semibold group-hover:underline ${isLead ? "text-3xl sm:text-4xl" : "text-lg"}`}
+        className={`mt-1.5 font-serif leading-odia font-semibold group-hover:underline ${isLead ? "text-3xl sm:text-4xl" : "text-lg sm:text-xl"}`}
       >
         {article.title}
       </h3>
       {article.summary && (
-        <div className={`mt-2 space-y-2 text-muted-foreground ${isLead ? "max-w-2xl text-base" : "text-sm"}`}>
+        <div
+          className={`mt-2 space-y-2 font-light text-muted-foreground leading-relaxed ${isLead ? "max-w-2xl text-base" : "text-sm"}`}
+        >
           {article.summary.split("\n\n").map((para, i) => (
-            <p key={i} className={!isLead ? "line-clamp-4" : undefined}>
+            <p key={i} className={!isLead ? "line-clamp-3" : undefined}>
               {para}
             </p>
           ))}

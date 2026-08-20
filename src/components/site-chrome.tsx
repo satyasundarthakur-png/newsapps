@@ -15,8 +15,8 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
             "linear-gradient(90deg, #9F1D35 0%, #D9432A 20%, #E8A93B 40%, #2E8B57 60%, #0E7C86 80%, #7C3AED 100%)",
         }}
       />
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-5">
-        <div className="flex items-center justify-between gap-4">
+      <div className="mx-auto max-w-6xl px-5 pt-5">
+        <div className="flex items-center justify-between gap-4 pb-4">
           <Link
             to="/"
             className="text-rainbow font-serif text-3xl font-extrabold tracking-tight sm:text-4xl"
@@ -24,61 +24,74 @@ export function SiteHeader({ activeSource }: { activeSource?: string }) {
             ମେରିଡିଆନ୍ ଖବର
           </Link>
           <div className="hidden items-center gap-3 sm:flex">
-            <span className="max-w-[14rem] text-right text-xs leading-snug tracking-wide text-muted-foreground">
+            <span className="max-w-[14rem] text-right text-xs leading-odia tracking-wide text-muted-foreground">
               ଓଡ଼ିଶା, ଜାତୀୟ ଓ ଆନ୍ତର୍ଜାତୀୟ ଖବର ଏକାଠି
             </span>
             <GlobeDoodle className="h-14 w-14 shrink-0 text-muted-foreground/70" />
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-          <Link
-            to="/"
-            search={{ source: "all" }}
-            className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-              !activeSource || activeSource === "all"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            ସବୁ
-          </Link>
-        </div>
-
-        {GROUP_ORDER.map((group) => (
-          <div key={group} className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-            <span className="mr-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">
-              {GROUP_LABELS[group]}
-            </span>
-            {SOURCES.filter((s) => s.group === group).map((s) => (
-              <Link
-                key={s.id}
-                to="/"
-                search={{ source: s.id }}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                  activeSource === s.id
-                    ? "text-white"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                style={activeSource === s.id ? { backgroundColor: s.accent } : undefined}
-              >
-                {s.name}
-                {s.jugadJson && (
-                  <span
-                    title="ଅନଧିକୃତ (unofficial) API — ଯେକୌଣସି ସମୟରେ ବନ୍ଦ ହୋଇପାରେ"
-                    className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
-                    style={{
-                      backgroundColor: activeSource === s.id ? "rgba(255,255,255,0.25)" : s.accent,
-                      color: "white",
-                    }}
-                  >
-                    ଅନଧିକୃତ
-                  </span>
-                )}
-              </Link>
-            ))}
+      {/* Sticky source selector: stays pinned under the browser chrome while
+          scrolling, so switching feeds never means scrolling back to the
+          top. On narrow screens each row scrolls horizontally instead of
+          wrapping, since a tall multi-row wrapped header eats too much of a
+          phone's viewport. */}
+      <div className="sticky top-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-3">
+          <div className="scrollbar-thin flex items-center gap-1.5 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible">
+            <Link
+              to="/"
+              search={{ source: "all" }}
+              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                !activeSource || activeSource === "all"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              ସବୁ
+            </Link>
           </div>
-        ))}
+
+          {GROUP_ORDER.map((group) => (
+            <div
+              key={group}
+              className="scrollbar-thin flex items-center gap-x-1.5 gap-y-1 overflow-x-auto pb-0.5 sm:flex-wrap sm:overflow-visible"
+            >
+              <span className="mr-1 shrink-0 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+                {GROUP_LABELS[group]}
+              </span>
+              {SOURCES.filter((s) => s.group === group).map((s) => (
+                <Link
+                  key={s.id}
+                  to="/"
+                  search={{ source: s.id }}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    activeSource === s.id
+                      ? "text-white"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  style={activeSource === s.id ? { backgroundColor: s.accent } : undefined}
+                >
+                  {s.name}
+                  {s.jugadJson && (
+                    <span
+                      title="ଅନଧିକୃତ (unofficial) API — ଯେକୌଣସି ସମୟରେ ବନ୍ଦ ହୋଇପାରେ"
+                      className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
+                      style={{
+                        backgroundColor:
+                          activeSource === s.id ? "rgba(255,255,255,0.25)" : s.accent,
+                        color: "white",
+                      }}
+                    >
+                      ଅନଧିକୃତ
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </header>
   );

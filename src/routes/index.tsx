@@ -3,6 +3,8 @@ import { z } from "zod";
 import { getNews } from "@/server-fns/news";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { NewsCard } from "@/components/news-card";
+import { StatusCard } from "@/components/status-card";
+import { NewsGridSkeleton } from "@/components/loading";
 import type { SourceId } from "@/data/sources";
 
 const title = "ମେରିଡିଆନ୍ ଖବର — ଏକ ସ୍ଥାନରେ ସବୁ ଓଡ଼ିଆ ଖବର";
@@ -19,6 +21,20 @@ export const Route = createFileRoute("/")({
     const result = await getNews({ data: deps.source as SourceId | "all" });
     return result;
   },
+  // Skeleton cards only show up on a client-side tab switch that's taking a
+  // moment (e.g. a source with a slow feed) — pendingMs delays it slightly
+  // so a fast, already-warm switch doesn't flash a skeleton for one frame.
+  pendingMs: 200,
+  pendingMinMs: 300,
+  pendingComponent: () => (
+    <div className="relative min-h-screen">
+      <SiteHeader />
+      <main className="mx-auto max-w-6xl px-5 py-10">
+        <NewsGridSkeleton />
+      </main>
+      <SiteFooter />
+    </div>
+  ),
   head: () => ({
     meta: [
       { title },
@@ -47,20 +63,13 @@ function Home() {
         <h1 className="sr-only">ମେରିଡିଆନ୍ ଖବର — ଆଜିର ମୁଖ୍ୟ ଶିରୋନାମା</h1>
 
         {comingSoon ? (
-          <div className="flex flex-col items-center gap-3 py-24 text-center">
-            <span
-              className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white"
-              style={{ backgroundColor: "#2BA84A" }}
-            >
-              ଶୀଘ୍ର ଆସୁଛି
-            </span>
-            <p className="max-w-md text-lg font-medium text-foreground">
-              DailyHunt ର ଲାଇଭ୍ ଖବର ଏଠାରେ ଶୀଘ୍ର ଯୋଡ଼ାଯିବ।
-            </p>
-            <p className="max-w-md text-sm text-muted-foreground">
-              DailyHuntର ଆଧିକାରିକ Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍ ମାଧ୍ୟମରେ ଉପଲବ୍ଧ — ଅନୁମୋଦନ
-              ପରେ ଏହି ଉତ୍ସର ଖବର ଏଠାରେ ଦେଖାଯିବ।
-            </p>
+          <div className="py-16">
+            <StatusCard
+              badge="ଶୀଘ୍ର ଆସୁଛି"
+              title="DailyHunt ର ଲାଇଭ୍ ଖବର ଏଠାରେ ଶୀଘ୍ର ଯୋଡ଼ାଯିବ।"
+              detail="DailyHuntର ଆଧିକାରିକ Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍ ମାଧ୍ୟମରେ ଉପଲବ୍ଧ — ଅନୁମୋଦନ ପରେ ଏହି ଉତ୍ସର ଖବର ଏଠାରେ ଦେଖାଯିବ।"
+              accent="#2BA84A"
+            />
           </div>
         ) : (
           <>
@@ -72,29 +81,25 @@ function Home() {
             )}
 
             {articles.length === 0 && source === "dailyhunt" && (
-              <div className="flex flex-col items-center gap-3 py-24 text-center">
-                <span
-                  className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white"
-                  style={{ backgroundColor: "#2BA84A" }}
-                >
-                  ଅନଧିକୃତ ଉତ୍ସ ବର୍ତ୍ତମାନ ଉପଲବ୍ଧ ନାହିଁ
-                </span>
-                <p className="max-w-md text-lg font-medium text-foreground">
-                  DailyHuntର ଅଫିସିଆଲ୍ ଫିଡ୍ ପାର୍ଟନର୍-ଓନଲି, ତେଣୁ ଏଠାରେ ଏକ ଅନଧିକୃତ (community jugad)
-                  JSON ଉତ୍ସରୁ ଚେଷ୍ଟା କରାଯାଉଛି — ଆଜି ଏହା ଉତ୍ତର ଦେଉନାହିଁ।
-                </p>
-                <p className="max-w-md text-sm text-muted-foreground">
-                  ଏହା ଏକ ଅନାଧିକୃତ, ରକ୍ଷଣାବେକ୍ଷଣ-ବିହୀନ ପ୍ରକଳ୍ପ ଉପରେ ନିର୍ଭରଶୀଳ ବୋଲି ଯେକୌଣସି ସମୟରେ ଏହା
-                  ବନ୍ଦ ହୋଇପାରେ। ସ୍ଥାୟୀ ସମାଧାନ ପାଇଁ DailyHuntର Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍
-                  ପାଇଁ ଆବେଦନ କରାଯାଇପାରେ।
-                </p>
+              <div className="py-16">
+                <StatusCard
+                  badge="ଅନଧିକୃତ ଉତ୍ସ ବର୍ତ୍ତମାନ ଉପଲବ୍ଧ ନାହିଁ"
+                  title="DailyHuntର ଅଫିସିଆଲ୍ ଫିଡ୍ ପାର୍ଟନର୍-ଓନଲି, ତେଣୁ ଏଠାରେ ଏକ ଅନଧିକୃତ (community jugad) JSON ଉତ୍ସରୁ ଚେଷ୍ଟା କରାଯାଉଛି — ଆଜି ଏହା ଉତ୍ତର ଦେଉନାହିଁ।"
+                  detail="ଏହା ଏକ ଅନାଧିକୃତ, ରକ୍ଷଣାବେକ୍ଷଣ-ବିହୀନ ପ୍ରକଳ୍ପ ଉପରେ ନିର୍ଭରଶୀଳ ବୋଲି ଯେକୌଣସି ସମୟରେ ଏହା ବନ୍ଦ ହୋଇପାରେ। ସ୍ଥାୟୀ ସମାଧାନ ପାଇଁ DailyHuntର Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍ ପାଇଁ ଆବେଦନ କରାଯାଇପାରେ।"
+                  accent="#2BA84A"
+                />
               </div>
             )}
 
             {articles.length === 0 && source !== "dailyhunt" && (
-              <p className="py-20 text-center text-muted-foreground">
-                ବର୍ତ୍ତମାନ କୌଣସି ଖବର ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ। ଦୟାକରି ପରେ ଚେଷ୍ଟା କରନ୍ତୁ।
-              </p>
+              <div className="py-16">
+                <StatusCard
+                  badge="ଅନୁପଲବ୍ଧ"
+                  title="ବର୍ତ୍ତମାନ କୌଣସି ଖବର ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ।"
+                  detail="ଦୟାକରି ପରେ ଚେଷ୍ଟା କରନ୍ତୁ, କିମ୍ବା ଅନ୍ୟ ଏକ ଉତ୍ସ ବାଛନ୍ତୁ।"
+                  accent="#6B7280"
+                />
+              </div>
             )}
 
             {lead && (
