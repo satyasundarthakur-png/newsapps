@@ -80,18 +80,7 @@ function Home() {
               </p>
             )}
 
-            {articles.length === 0 && source === "dailyhunt" && (
-              <div className="py-16">
-                <StatusCard
-                  badge="ଅନଧିକୃତ ଉତ୍ସ ବର୍ତ୍ତମାନ ଉପଲବ୍ଧ ନାହିଁ"
-                  title="DailyHuntର ଅଫିସିଆଲ୍ ଫିଡ୍ ପାର୍ଟନର୍-ଓନଲି, ତେଣୁ ଏଠାରେ ଏକ ଅନଧିକୃତ (community jugad) JSON ଉତ୍ସରୁ ଚେଷ୍ଟା କରାଯାଉଛି — ଆଜି ଏହା ଉତ୍ତର ଦେଉନାହିଁ।"
-                  detail="ଏହା ଏକ ଅନାଧିକୃତ, ରକ୍ଷଣାବେକ୍ଷଣ-ବିହୀନ ପ୍ରକଳ୍ପ ଉପରେ ନିର୍ଭରଶୀଳ ବୋଲି ଯେକୌଣସି ସମୟରେ ଏହା ବନ୍ଦ ହୋଇପାରେ। ସ୍ଥାୟୀ ସମାଧାନ ପାଇଁ DailyHuntର Content Syndication API ପାର୍ଟନର୍‌ଶିପ୍ ପାଇଁ ଆବେଦନ କରାଯାଇପାରେ।"
-                  accent="#2BA84A"
-                />
-              </div>
-            )}
-
-            {articles.length === 0 && source !== "dailyhunt" && (
+            {articles.length === 0 && (
               <div className="py-16">
                 <StatusCard
                   badge="ଅନୁପଲବ୍ଧ"
